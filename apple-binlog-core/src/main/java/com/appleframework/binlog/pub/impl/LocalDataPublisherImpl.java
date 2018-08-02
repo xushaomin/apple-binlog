@@ -34,7 +34,7 @@ public class LocalDataPublisherImpl implements DataPublisher {
 	public void publish(EventBaseDTO data, Set<ClientInfo> clientInfos) {
 
 		String eventDatabase = data.getDatabase();
-		String eventTable = data.getDatabase();
+		String eventTable = data.getTable();
 
 		clientInfos.forEach(clientInfo -> {
 			String database = clientInfo.getDatabaseName();
