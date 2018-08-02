@@ -8,21 +8,21 @@ import org.springframework.stereotype.Service;
 @Service
 public class MapLogStatusSync implements LogStatusSync {
 
-	private static Map<String, Object> map = new HashMap<>();
+	private static Map<String, String> map = new HashMap<>();
 	
 	@Override
 	public void updateBinaryLogStatus(Long serverId, Long binlogPosition) {
-		map.put("binlogPosition", binlogPosition);
+		map.put("binlogPosition", binlogPosition.toString());
 	}
 
 	@Override
 	public void updateBinaryLogStatus(Long serverId, String binlogFilename, Long binlogPosition) {
 		map.put("binlogFilename", binlogFilename);
-		map.put("binlogPosition", binlogPosition);
+		map.put("binlogPosition", binlogPosition.toString());
 	}
 
 	@Override
-	public Map<String, Object> getBinaryLogStatus(Long serverId) {
+	public Map<String, String> getBinaryLogStatus(Long serverId) {
 		return map;
 	}	
 	

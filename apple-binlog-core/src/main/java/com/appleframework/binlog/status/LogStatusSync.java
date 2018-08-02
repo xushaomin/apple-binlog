@@ -8,5 +8,5 @@ public interface LogStatusSync {
 	
 	public void updateBinaryLogStatus(Long serverId, String binlogFilename, Long binlogPosition);
 	
-	public Map<String, Object> getBinaryLogStatus(Long serverId);
+	public Map<String, String> getBinaryLogStatus(Long serverId);
 }

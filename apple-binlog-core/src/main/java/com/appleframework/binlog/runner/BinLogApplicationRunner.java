@@ -89,18 +89,18 @@ public class BinLogApplicationRunner {
      * 配置当前binlog位置
      * @param client
      */
-    private void configBinaryLogStatus(BinaryLogClient client) {
-        Map<String, Object> binLogStatus = logStatusSync.getBinaryLogStatus(client.getServerId());
-        if (binLogStatus != null) {
-            Object binlogFilename = binLogStatus.get("binlogFilename");
-            if (binlogFilename != null) {
-                client.setBinlogFilename((String) binlogFilename);
-            }
-            Object binlogPosition = binLogStatus.get("binlogPosition");
-            if (binlogPosition != null) {
-                client.setBinlogPosition((Long) binlogPosition);
-            }
-        }
-    }
+	private void configBinaryLogStatus(BinaryLogClient client) {
+		Map<String, String> binLogStatus = logStatusSync.getBinaryLogStatus(client.getServerId());
+		if (binLogStatus != null) {
+			String binlogFilename = binLogStatus.get("binlogFilename");
+			if (binlogFilename != null) {
+				client.setBinlogFilename((String) binlogFilename);
+			}
+			String binlogPosition = binLogStatus.get("binlogPosition");
+			if (binlogPosition != null) {
+				client.setBinlogPosition(Long.parseLong(binlogPosition));
+			}
+		}
+	}
 
 }
