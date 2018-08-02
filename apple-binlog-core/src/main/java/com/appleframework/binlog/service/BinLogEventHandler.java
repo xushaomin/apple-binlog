@@ -62,7 +62,7 @@ public abstract class BinLogEventHandler {
      */
     protected void publish(EventBaseDTO data) {
         if (data != null) {
-            log.info("推送信息,{}", data);
+            log.debug("推送信息,{}", data);
             dataPublisher.publish(data);
         }
     }
