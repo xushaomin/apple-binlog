@@ -79,8 +79,15 @@ public class BinLogApplicationRunner {
             try {
                 client.connect();
             } catch (Exception e) {
-                // TODO: 17/01/2018 继续优化异常处理逻辑
                 log.error("处理事件异常，{}", e);
+                client.setBinlogFilename(null);
+                client.setBinlogPosition(4L);
+                try {
+					client.disconnect();
+	                client.connect();
+				} catch (Exception e1) {
+					log.error("处理事件异常，{}", e1);
+				}
             }
         });
     }
@@ -94,7 +101,7 @@ public class BinLogApplicationRunner {
 		if (binLogStatus != null) {
 			String binlogFilename = binLogStatus.get("binlogFilename");
 			if (binlogFilename != null) {
-				client.setBinlogFilename((String) binlogFilename);
+				client.setBinlogFilename(binlogFilename);
 			}
 			String binlogPosition = binLogStatus.get("binlogPosition");
 			if (binlogPosition != null) {
