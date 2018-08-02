@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.appleframework.binlog</groupId>
 		<artifactId>apple-binlog</artifactId>
-		<version>0.0.3.RELEASE</version>
+		<version>0.0.4.RELEASE</version>
 	</parent>
 	<artifactId>apple-binlog-core</artifactId>
 	<name>apple-binlog-core</name>
@@ -35,13 +35,7 @@
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.25</version>
 		</dependency>
-
-		<dependency>
-			<groupId>org.apache.tomcat</groupId>
-			<artifactId>tomcat-jdbc</artifactId>
-			<version>8.5.23</version>
-		</dependency>
-		
+				
 		<dependency>
   			<groupId>org.springframework</groupId>
   			<artifactId>spring-context</artifactId>

@@ -29,10 +29,8 @@ public class WriteRowsDTO extends EventBaseDTO {
         this.rowMaps = rowMaps;
     }
 
-    @Override
-    public String toString() {
-        return "WriteRowsDTO{" +
-                "rowMaps=" + rowMaps +
-                "} " + super.toString();
-    }
+	@Override
+	public String toString() {
+		return "WriteRowsDTO{" + "rowMaps=" + rowMaps + "} " + super.toString();
+	}
 }

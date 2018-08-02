@@ -35,11 +35,8 @@ public class UpdateRow implements Serializable {
         this.afterRowMap = afterRowMap;
     }
 
-    @Override
-    public String toString() {
-        return "UpdateRow{" +
-                "beforeRowMap=" + beforeRowMap +
-                ", afterRowMap=" + afterRowMap +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "UpdateRow{" + "beforeRowMap=" + beforeRowMap + ", afterRowMap=" + afterRowMap + '}';
+	}
 }

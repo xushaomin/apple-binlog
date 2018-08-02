@@ -27,10 +27,8 @@ public class UpdateRowsDTO extends EventBaseDTO {
         this.rows = rows;
     }
 
-    @Override
-    public String toString() {
-        return "UpdateRowsDTO{" +
-                "rows=" + rows +
-                "} " + super.toString();
-    }
+	@Override
+	public String toString() {
+		return "UpdateRowsDTO{" + "rows=" + rows + "} " + super.toString();
+	}
 }

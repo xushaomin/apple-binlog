@@ -29,10 +29,8 @@ public class DeleteRowsDTO extends EventBaseDTO {
         this.rowMaps = rowMaps;
     }
 
-    @Override
-    public String toString() {
-        return "DeleteRowsDTO{" +
-                "rowMaps=" + rowMaps +
-                "} " + super.toString();
-    }
+	@Override
+	public String toString() {
+		return "DeleteRowsDTO{" + "rowMaps=" + rowMaps + "} " + super.toString();
+	}
 }

@@ -20,46 +20,46 @@ import com.github.shyiko.mysql.binlog.event.EventType;
  */
 @Service
 public class BinLogEventHandlerFactory {
-	
-    private static final Logger log = LoggerFactory.getLogger(BinLogDefaultEventHandler.class);
+
+	private static final Logger log = LoggerFactory.getLogger(BinLogDefaultEventHandler.class);
 
 	@Resource
 	private BinLogUpdateEventHandler binLogUpdateEventHandler;
 
 	@Resource
 	private BinLogWriteEventHandler binLogWriteEventHandler;
-	
+
 	@Resource
 	private BinLogDeleteEventHandler binLogDeleteEventHandler;
-	
+
 	@Resource
 	private BinLogDefaultEventHandler binLogDefaultEventHandler;
-	
+
 	@Resource
 	private BinLogTableMapEventHandler binLogTableMapEventHandler;
-	
+
 	@Resource
 	private BinLogRotateEventHandler binLogRotateEventHandler;
 
-    public BinLogEventHandler getHandler(EventHeader header) {
-        //考虑到状态映射的问题，只在增删改是更新位置
-        if (EventType.isUpdate(header.getEventType())) {
-            return binLogUpdateEventHandler;
-        } else if (EventType.isWrite(header.getEventType())) {
-            return binLogWriteEventHandler;
-        } else if (EventType.isDelete(header.getEventType())) {
-            return binLogDeleteEventHandler;
-        } else if (EventType.TABLE_MAP.equals(header.getEventType())) {
-            log.debug("TableMapEvent-header:{}", header);
-            return binLogTableMapEventHandler;
-        } else if (EventType.ROTATE.equals(header.getEventType())) {
-            log.debug("RotateEvent-header:{}", header);
-            return binLogRotateEventHandler;
-        } else {
-            log.debug("不处理事件,{}", header);
-            return binLogDefaultEventHandler;
-        }
-    }
+	public BinLogEventHandler getHandler(EventHeader header) {
+		// 考虑到状态映射的问题，只在增删改是更新位置
+		if (EventType.isUpdate(header.getEventType())) {
+			return binLogUpdateEventHandler;
+		} else if (EventType.isWrite(header.getEventType())) {
+			return binLogWriteEventHandler;
+		} else if (EventType.isDelete(header.getEventType())) {
+			return binLogDeleteEventHandler;
+		} else if (EventType.TABLE_MAP.equals(header.getEventType())) {
+			log.debug("TableMapEvent-header:{}", header);
+			return binLogTableMapEventHandler;
+		} else if (EventType.ROTATE.equals(header.getEventType())) {
+			log.debug("RotateEvent-header:{}", header);
+			return binLogRotateEventHandler;
+		} else {
+			log.debug("不处理事件,{}", header);
+			return binLogDefaultEventHandler;
+		}
+	}
 
 	public void setBinLogUpdateEventHandler(BinLogUpdateEventHandler binLogUpdateEventHandler) {
 		this.binLogUpdateEventHandler = binLogUpdateEventHandler;
@@ -84,5 +84,5 @@ public class BinLogEventHandlerFactory {
 	public void setBinLogRotateEventHandler(BinLogRotateEventHandler binLogRotateEventHandler) {
 		this.binLogRotateEventHandler = binLogRotateEventHandler;
 	}
-    
+
 }

@@ -78,13 +78,9 @@ public class EventBaseDTO implements Serializable {
         return Objects.hash(uuid);
     }
 
-    @Override
-    public String toString() {
-        return "EventBaseDTO{" +
-                "uuid='" + uuid + '\'' +
-                ", eventType=" + eventType +
-                ", database='" + database + '\'' +
-                ", table='" + table + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "EventBaseDTO{" + "uuid='" + uuid + '\'' + ", eventType=" + eventType + ", database='" + database + '\''
+				+ ", table='" + table + '\'' + '}';
+	}
 }
