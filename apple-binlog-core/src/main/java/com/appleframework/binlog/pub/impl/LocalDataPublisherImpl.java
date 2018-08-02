@@ -3,6 +3,7 @@ package com.appleframework.binlog.pub.impl;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.appleframework.binlog.enums.DatabaseEvent;
+import com.appleframework.binlog.model.ClientInfo;
 import com.appleframework.binlog.model.DeleteRowsDTO;
 import com.appleframework.binlog.model.EventBaseDTO;
 import com.appleframework.binlog.model.ProducerDataDTO;
@@ -29,37 +31,46 @@ public class LocalDataPublisherImpl implements DataPublisher {
 	private DataProducer dataProducer;
 
 	@Override
-	public void publish(EventBaseDTO data) {
-		String database = data.getDatabase();
-		String table = data.getTable();
+	public void publish(EventBaseDTO data, Set<ClientInfo> clientInfos) {
 
-		if (data instanceof UpdateRowsDTO) {
-			UpdateRowsDTO updateData = (UpdateRowsDTO) data;
-			List<UpdateRow> list = updateData.getRows();
-			for (UpdateRow updateRow : list) {
-				ProducerDataDTO dto = new ProducerDataDTO(DatabaseEvent.UPDATE_ROWS, database, table);
-				dto.setData(updateRow.getAfterRowMap());
-				dataProducer.produce(dto);
+		String eventDatabase = data.getDatabase();
+		String eventTable = data.getDatabase();
+
+		clientInfos.forEach(clientInfo -> {
+			String database = clientInfo.getDatabaseName();
+			String table = clientInfo.getTableName();
+
+			if (eventDatabase.equals(database) && eventTable.equals(table)) {
+				if (data instanceof UpdateRowsDTO) {
+					UpdateRowsDTO updateData = (UpdateRowsDTO) data;
+					List<UpdateRow> list = updateData.getRows();
+					for (UpdateRow updateRow : list) {
+						ProducerDataDTO dto = new ProducerDataDTO(DatabaseEvent.UPDATE_ROWS, database, table);
+						dto.setData(updateRow.getAfterRowMap());
+						dataProducer.produce(dto);
+					}
+				} else if (data instanceof WriteRowsDTO) {
+					WriteRowsDTO writeData = (WriteRowsDTO) data;
+					List<Map<String, Serializable>> list = writeData.getRowMaps();
+					for (Map<String, Serializable> mdata : list) {
+						ProducerDataDTO dto = new ProducerDataDTO(DatabaseEvent.WRITE_ROWS, database, table);
+						dto.setData(mdata);
+						dataProducer.produce(dto);
+					}
+				} else if (data instanceof DeleteRowsDTO) {
+					DeleteRowsDTO deleteData = (DeleteRowsDTO) data;
+					List<Map<String, Serializable>> list = deleteData.getRowMaps();
+					for (Map<String, Serializable> mdata : list) {
+						ProducerDataDTO dto = new ProducerDataDTO(DatabaseEvent.DELETE_ROWS, database, table);
+						dto.setData(mdata);
+						dataProducer.produce(dto);
+					}
+				} else {
+					log.debug(data.toString());
+				}
 			}
-		} else if (data instanceof WriteRowsDTO) {
-			WriteRowsDTO writeData = (WriteRowsDTO) data;
-			List<Map<String, Serializable>> list = writeData.getRowMaps();
-			for (Map<String, Serializable> mdata : list) {
-				ProducerDataDTO dto = new ProducerDataDTO(DatabaseEvent.WRITE_ROWS, database, table);
-				dto.setData(mdata);
-				dataProducer.produce(dto);
-			}
-		} else if (data instanceof DeleteRowsDTO) {
-			DeleteRowsDTO deleteData = (DeleteRowsDTO) data;
-			List<Map<String, Serializable>> list = deleteData.getRowMaps();
-			for (Map<String, Serializable> mdata : list) {
-				ProducerDataDTO dto = new ProducerDataDTO(DatabaseEvent.DELETE_ROWS, database, table);
-				dto.setData(mdata);
-				dataProducer.produce(dto);
-			}
-		} else {
-			log.debug(data.toString());
-		}
+
+		});
 
 	}
 

@@ -21,11 +21,11 @@ public class StartTest {
 	public void testAddOpinion1() {
 		try {
 			
-			BinaryLogConfig.host = "192.168.1.211";
-			BinaryLogConfig.port = 3306;
-			BinaryLogConfig.username = "root";
-			BinaryLogConfig.password = "bykj@2017~";
-			BinaryLogConfig.serverId = 123456L;
+			BinaryLogConfig.setHost("192.168.1.211");
+			BinaryLogConfig.setPort(3306);
+			BinaryLogConfig.setUsername("root");
+			BinaryLogConfig.setPassword("bykj@2017~");
+			BinaryLogConfig.setServerId(123456L);
 
 			binLogApplicationRunner.run();
 			System.in.read();

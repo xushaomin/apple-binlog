@@ -39,10 +39,10 @@ public class BinLogApplicationRunner {
 	public void run() {
         // 在线程中启动事件监听
         executorService.submit(() -> {
-        	String username = BinaryLogConfig.username;
-        	int port = BinaryLogConfig.port;
-        	String host = BinaryLogConfig.host;
-        	String password = BinaryLogConfig.password;
+        	String username = BinaryLogConfig.getUsername();
+        	int port = BinaryLogConfig.getPort();
+        	String host = BinaryLogConfig.getHost();
+        	String password = BinaryLogConfig.getPassword();
             final BinaryLogClient client = new BinaryLogClient(host, port, username, password);
             client.registerEventListener(event -> {
                 EventHeader header = event.getHeader();
@@ -72,7 +72,7 @@ public class BinLogApplicationRunner {
                 }
             });
             // 设置server id
-            client.setServerId(BinaryLogConfig.serverId);
+            client.setServerId(BinaryLogConfig.getServerId());
             // 配置当前位置
             configBinaryLogStatus(client);
             // 启动连接

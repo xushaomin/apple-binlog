@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.appleframework.binlog</groupId>
 		<artifactId>apple-binlog</artifactId>
-		<version>0.0.4.RELEASE</version>
+		<version>0.0.5.RELEASE</version>
 	</parent>
 	<artifactId>apple-binlog-core</artifactId>
 	<name>apple-binlog-core</name>
@@ -57,9 +57,10 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>com.alibaba</groupId>
-			<artifactId>druid</artifactId>
-			<version>1.1.10</version>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-jdbc</artifactId>
+			<version>8.0.53</version>
+			<scope>provided</scope>
 		</dependency>
 
 	</dependencies>

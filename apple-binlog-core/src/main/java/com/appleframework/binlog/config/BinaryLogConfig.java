@@ -2,11 +2,11 @@ package com.appleframework.binlog.config;
 
 public class BinaryLogConfig {
 
-	public static String host;
-	public static Integer port;
-	public static String username;
-	public static String password;
-	public static Long serverId;
+	private static String host;
+	private static Integer port;
+	private static String username;
+	private static String password;
+	private static Long serverId;
 
 	public static String getHost() {
 		return host;

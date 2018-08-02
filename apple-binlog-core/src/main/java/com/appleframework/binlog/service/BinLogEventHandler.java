@@ -1,14 +1,17 @@
 package com.appleframework.binlog.service;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 import com.appleframework.binlog.config.BinaryLogConfig;
+import com.appleframework.binlog.model.ClientInfo;
 import com.appleframework.binlog.model.ColumnsTableMapEventData;
 import com.appleframework.binlog.model.EventBaseDTO;
 import com.appleframework.binlog.pub.DataPublisher;
@@ -28,6 +31,9 @@ public abstract class BinLogEventHandler {
 
 	@Resource
 	protected DataPublisher dataPublisher;
+	
+	@Resource
+	protected ClientService clientService;
 
 	public void setDataPublisher(DataPublisher dataPublisher) {
 		this.dataPublisher = dataPublisher;
@@ -43,8 +49,11 @@ public abstract class BinLogEventHandler {
 	 * @param event
 	 */
 	public void handle(Event event) {
-		publish(formatData(event));
-		updateBinaryLogStatus(event.getHeader());
+		Set<ClientInfo> clientInfos = filter(event);
+        if (!CollectionUtils.isEmpty(clientInfos)) {
+            publish(formatData(event), clientInfos);
+            updateBinaryLogStatus(event.getHeader());
+        }
 	}
 
 	/**
@@ -60,10 +69,10 @@ public abstract class BinLogEventHandler {
 	 *
 	 * @param data
 	 */
-	protected void publish(EventBaseDTO data) {
+	protected void publish(EventBaseDTO data, Set<ClientInfo> clientInfos) {
 		if (data != null) {
 			log.debug("推送信息,{}", data);
-			dataPublisher.publish(data);
+			dataPublisher.publish(data, clientInfos);
 		}
 	}
 
@@ -73,6 +82,15 @@ public abstract class BinLogEventHandler {
 	 * @param header
 	 */
 	protected void updateBinaryLogStatus(EventHeaderV4 header) {
-		logStatusSync.updateBinaryLogStatus(BinaryLogConfig.serverId, header.getNextPosition());
+		logStatusSync.updateBinaryLogStatus(BinaryLogConfig.getServerId(), header.getNextPosition());
 	}
+	
+	/**
+     * 筛选出关注某事件的应用列表
+     * @param event
+     * @return
+     */
+    protected Set<ClientInfo> filter(Event event) {
+        return clientService.listClient();
+    }
 }

@@ -1,43 +1,42 @@
 package com.appleframework.binlog.factory;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 
+import org.apache.tomcat.jdbc.pool.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.FactoryBean;
 
-import com.alibaba.druid.pool.DruidDataSource;
-import com.alibaba.druid.pool.DruidPooledConnection;
 import com.appleframework.binlog.config.BinaryLogConfig;
 
-public class DatasouceFactory implements FactoryBean<DruidDataSource> {
+public class DatasouceFactory implements FactoryBean<DataSource> {
 
 	private static Logger logger = LoggerFactory.getLogger(DatasouceFactory.class);
 
-	private DruidDataSource dataSource;
+	private DataSource dataSource;
 
 	private String DS_URL_FORMAT = "jdbc:mysql://{0}:{1}/mysql?characterEncoding=UTF-8&autoReconnect=true";
 
 	@Override
-	public DruidDataSource getObject() throws Exception {
+	public DataSource getObject() throws Exception {
 		logger.info("begin init redis...");
-		dataSource = new DruidDataSource();
+		dataSource = new DataSource();
 		dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-		dataSource.setUsername(BinaryLogConfig.username);
-		dataSource.setPassword(BinaryLogConfig.password);
+		dataSource.setUsername(BinaryLogConfig.getUsername());
+		dataSource.setPassword(BinaryLogConfig.getPassword());
 		dataSource.setUrl(getUrl());
-		dataSource.setInitialSize(5);
+		dataSource.setInitialSize(1);
 		dataSource.setMinIdle(1);
+		dataSource.setMaxIdle(5);
 		dataSource.setMaxActive(10);
-		dataSource.setFilters("stat");
-		dataSource.setPoolPreparedStatements(false);
 		// test();
 		return dataSource;
 	}
 
 	public void test() {
-		DruidPooledConnection connection;
+		Connection connection;
 		try {
 			connection = dataSource.getConnection();
 			connection.close();
@@ -48,7 +47,7 @@ public class DatasouceFactory implements FactoryBean<DruidDataSource> {
 
 	@Override
 	public Class<?> getObjectType() {
-		return DruidDataSource.class;
+		return DataSource.class;
 	}
 
 	@Override

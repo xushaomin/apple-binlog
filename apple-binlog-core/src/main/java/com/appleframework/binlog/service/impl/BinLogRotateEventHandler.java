@@ -19,7 +19,7 @@ public class BinLogRotateEventHandler extends BinLogEventHandler {
         RotateEventData d = event.getData();
         String binlogFilename = d.getBinlogFilename();
         Long binlogPosition = d.getBinlogPosition();
-        logStatusSync.updateBinaryLogStatus(BinaryLogConfig.serverId, binlogFilename, binlogPosition);
+        logStatusSync.updateBinaryLogStatus(BinaryLogConfig.getServerId(), binlogFilename, binlogPosition);
     }
 
 	@Override

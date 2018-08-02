@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
+import com.appleframework.binlog.model.ClientInfo;
 import com.appleframework.binlog.model.EventBaseDTO;
 import com.appleframework.binlog.model.UpdateRow;
 import com.appleframework.binlog.model.UpdateRowsDTO;
@@ -22,7 +23,7 @@ public class DataPublisherImpl implements DataPublisher {
 	}
 
 	@Override
-	public void publish(EventBaseDTO data) {
+	public void publish(EventBaseDTO data, Set<ClientInfo> clientInfos) {
 		String database = data.getDatabase();
 		String table = data.getTable();
 		String key = database + ":" + table;
