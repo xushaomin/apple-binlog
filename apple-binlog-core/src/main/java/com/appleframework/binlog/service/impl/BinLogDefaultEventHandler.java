@@ -15,7 +15,7 @@ public class BinLogDefaultEventHandler extends BinLogEventHandler {
 
     @Override
     public void handle(Event event) {
-        log.error("跳过不处理事件event:{}", event);
+        log.debug("跳过不处理事件event:{}", event);
     }
 
 	@Override
