@@ -79,14 +79,14 @@ public class BinLogApplicationRunner {
             try {
                 client.connect();
             } catch (Exception e) {
-                log.error("处理事件异常，{}", e);
+                log.error("连接失败，{}", e.getMessage());
                 client.setBinlogFilename(null);
                 client.setBinlogPosition(4L);
                 try {
 					client.disconnect();
 	                client.connect();
 				} catch (Exception e1) {
-					log.error("处理事件异常，{}", e1);
+					log.error("重连失败，{}", e1.getMessage());
 				}
             }
         });
