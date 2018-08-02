@@ -13,7 +13,7 @@
 	<url>http://maven.apache.org</url>
 
 	<properties>
-		<binlog.version>0.13.0</binlog.version>
+		<binlog.version>0.16.1</binlog.version>
 	</properties>
 	
 	<dependencies>
