@@ -37,6 +37,7 @@ public class BinLogApplicationRunner {
 	}
 
 	public void run() {
+		initBinaryLogStatus();
         // 在线程中启动事件监听
         executorService.submit(() -> {
         	String username = BinaryLogConfig.getUsername();
@@ -50,7 +51,6 @@ public class BinLogApplicationRunner {
                 handler.handle(event);
             });
             client.registerLifecycleListener(new BinaryLogClient.LifecycleListener() {
-
                 @Override
                 public void onConnect(BinaryLogClient client) {
                     log.info("connect success");
@@ -81,7 +81,8 @@ public class BinLogApplicationRunner {
             } catch (Exception e) {
                 log.error("连接失败，{}", e.getMessage());
                 client.setBinlogFilename(null);
-                client.setBinlogPosition(4L);
+                client.setBinlogPosition(0);
+                resetBinaryLogStatus();
                 try {
 					client.disconnect();
 	                client.connect();
@@ -91,6 +92,18 @@ public class BinLogApplicationRunner {
             }
         });
     }
+	
+	private void resetBinaryLogStatus() {
+		logStatusSync.updateBinaryLogStatus(BinaryLogConfig.getServerId(), null, 0L);
+	}
+	
+	private void initBinaryLogStatus() {
+		if(BinaryLogConfig.getInit()) {
+			long postition = BinaryLogConfig.getPosition();
+			String filename = BinaryLogConfig.getFilename();
+			logStatusSync.updateBinaryLogStatus(BinaryLogConfig.getServerId(), filename, postition);
+		}
+	}
 
     /**
      * 配置当前binlog位置
