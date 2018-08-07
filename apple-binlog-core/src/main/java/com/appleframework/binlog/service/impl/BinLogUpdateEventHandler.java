@@ -49,10 +49,8 @@ public class BinLogUpdateEventHandler extends BinLogEventHandler {
     private Map<String,Serializable> convert(Serializable[] data,int[] includedColumns,
     		ColumnsTableMapEventData tableMapData){
         Map<String, Serializable> result = new HashMap<>();
-        if(includedColumns.length > 0) {
-            IntStream.range(0, includedColumns.length)
-            	.forEach(i -> result.put(tableMapData.getColumnNames().get(includedColumns[i]), data[i]));
-        }
+        IntStream.range(0, includedColumns.length)
+                .forEach(i -> result.put(tableMapData.getColumnNames().get(includedColumns[i]), data[i]));
         return result;
     }
 
