@@ -9,4 +9,6 @@ public interface LogStatusSync {
 	public void updateBinaryLogStatus(Long serverId, String binlogFilename, Long binlogPosition);
 	
 	public Map<String, String> getBinaryLogStatus(Long serverId);
+	
+	public void initBinaryLogStatus(Long serverId);
 }

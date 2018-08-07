@@ -24,6 +24,11 @@ public class MapLogStatusSync implements LogStatusSync {
 	@Override
 	public Map<String, String> getBinaryLogStatus(Long serverId) {
 		return map;
-	}	
+	}
+
+	@Override
+	public void initBinaryLogStatus(Long serverId) {
+		map.clear();
+	}
 	
 }
