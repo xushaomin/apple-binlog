@@ -31,7 +31,7 @@ public class BinLogWriteEventHandler extends BinLogEventHandler {
         //添加列映射
         int[] includedColumns = d.getIncludedColumns().stream().toArray();
         writeRowsDTO.setRowMaps(d.getRows().stream()
-                .map(r -> convert(r,includedColumns,tableMapData)).collect(Collectors.toList()));
+				.map(r -> convert(r, includedColumns, tableMapData)).collect(Collectors.toList()));
         return writeRowsDTO;
     }
 
@@ -45,10 +45,11 @@ public class BinLogWriteEventHandler extends BinLogEventHandler {
     private Map<String,Serializable> convert(Serializable[] data, int[] includedColumns, 
     		ColumnsTableMapEventData tableMapData){
         Map<String, Serializable> result = new HashMap<>();
-        IntStream.range(0, includedColumns.length)
-                .forEach(i -> result.put(tableMapData.getColumnNames().get(includedColumns[i]), data[i]));
+        if(includedColumns.length > 0) {
+        	IntStream.range(0, includedColumns.length)
+        		.forEach(i -> result.put(tableMapData.getColumnNames().get(includedColumns[i]), data[i]));
+        }
         return result;
-
     }
 
 }
