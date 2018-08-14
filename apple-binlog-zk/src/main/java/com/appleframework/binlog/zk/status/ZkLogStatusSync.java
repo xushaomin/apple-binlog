@@ -1,22 +1,16 @@
 package com.appleframework.binlog.zk.status;
 
-import javax.annotation.PostConstruct;
-
-import org.springframework.stereotype.Service;
-
 import com.appleframework.binlog.config.BinaryLogConfig;
 import com.appleframework.binlog.model.LogStatus;
 import com.appleframework.binlog.status.LogStatusSync;
 import com.appleframework.binlog.zk.config.ZkConfig;
 import com.appleframework.binlog.zk.election.ZkClientUtil;
 
-@Service("logStatusSync")
 public class ZkLogStatusSync implements LogStatusSync {
 	
 	private static String BINLOG_FILENAME = "binlogFilename";
 	private static String BINLOG_POSITION = "binlogPosition";
 		
-	@PostConstruct
 	public void init() {
 		Long serverId = BinaryLogConfig.getServerId();
 		String binlogFilenamePath = getBinlogFilenamePath(serverId);
