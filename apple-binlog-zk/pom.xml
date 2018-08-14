@@ -1,40 +1,43 @@
 <?xml version="1.0"?>
 <project
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.appleframework.binlog</groupId>
 		<artifactId>apple-binlog</artifactId>
 		<version>0.1.6.RELEASE</version>
 	</parent>
-	<artifactId>apple-binlog-core</artifactId>
-	<name>apple-binlog-core</name>
+	<artifactId>apple-binlog-zk</artifactId>
+	<name>apple-binlog-zk</name>
 	<url>http://maven.apache.org</url>
-
 	<properties>
-		<binlog.version>0.16.1</binlog.version>
-		<tomcat.version>8.0.53</tomcat.version>
+		<curator.version>4.0.1</curator.version>
+		<zookeeper.version>3.4.6</zookeeper.version>
 	</properties>
-	
 	<dependencies>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>apple-binlog-core</artifactId>
+			<version>${project.version}</version>
 		</dependency>
-
 		<dependency>
-			<groupId>com.github.shyiko</groupId>
-			<artifactId>mysql-binlog-connector-java</artifactId>
+			<groupId>org.apache.curator</groupId>
+			<artifactId>curator-framework</artifactId>
+			<scope>provided</scope>
 		</dependency>
-
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
+			<groupId>org.apache.curator</groupId>
+			<artifactId>curator-recipes</artifactId>
+			<scope>provided</scope>
 		</dependency>
-				
 		<dependency>
+			<groupId>org.apache.zookeeper</groupId>
+			<artifactId>zookeeper</artifactId>
+			<scope>provided</scope>
+		</dependency>  		
+  		<dependency>
   			<groupId>org.springframework</groupId>
   			<artifactId>spring-context</artifactId>
   			<scope>provided</scope>
@@ -44,11 +47,6 @@
   			<groupId>org.springframework</groupId>
   			<artifactId>spring-test</artifactId>
   			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>mysql</groupId>
-  			<artifactId>mysql-connector-java</artifactId>
 		</dependency>
 		
 		<dependency>

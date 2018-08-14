@@ -1,6 +1,6 @@
 package com.appleframework.binlog.status;
 
-import java.util.Map;
+import com.appleframework.binlog.model.LogStatus;
 
 public interface LogStatusSync {
 
@@ -8,7 +8,7 @@ public interface LogStatusSync {
 	
 	public void updateBinaryLogStatus(Long serverId, String binlogFilename, Long binlogPosition);
 	
-	public Map<String, String> getBinaryLogStatus(Long serverId);
+	public LogStatus getBinaryLogStatus(Long serverId);
 	
 	public void initBinaryLogStatus(Long serverId);
 }

@@ -1,6 +1,6 @@
 package com.appleframework.binlog.runner;
 
-import java.util.Map;
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -8,17 +8,20 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.appleframework.binlog.config.BinaryLogConfig;
+import com.appleframework.binlog.model.LogStatus;
 import com.appleframework.binlog.service.BinLogEventHandler;
 import com.appleframework.binlog.service.BinLogEventHandlerFactory;
 import com.appleframework.binlog.status.LogStatusSync;
 import com.github.shyiko.mysql.binlog.BinaryLogClient;
 import com.github.shyiko.mysql.binlog.event.EventHeader;
 
-public class BinLogApplicationRunner {
+@Component("applicationRunner")
+public class BinLogApplicationRunner implements ApplicationRunner {
     
-	private static final Logger log = LoggerFactory.getLogger(BinLogApplicationRunner.class);
+	private static final Logger logger = LoggerFactory.getLogger(BinLogApplicationRunner.class);
 
     private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
@@ -35,9 +38,11 @@ public class BinLogApplicationRunner {
 	public void setBinLogEventHandlerFactory(BinLogEventHandlerFactory binLogEventHandlerFactory) {
 		this.binLogEventHandlerFactory = binLogEventHandlerFactory;
 	}
+	
+	private BinaryLogClient client;
 
 	public void run() {
-		if(BinaryLogConfig.getInit()) {
+		if(BinaryLogConfig.isInit()) {
 			initBinaryLogStatus();
 		}
         // 在线程中启动事件监听
@@ -46,7 +51,7 @@ public class BinLogApplicationRunner {
         	int port = BinaryLogConfig.getPort();
         	String host = BinaryLogConfig.getHost();
         	String password = BinaryLogConfig.getPassword();
-            final BinaryLogClient client = new BinaryLogClient(host, port, username, password);
+            client = new BinaryLogClient(host, port, username, password);
             client.registerEventListener(event -> {
                 EventHeader header = event.getHeader();
                 BinLogEventHandler handler = binLogEventHandlerFactory.getHandler(header);
@@ -55,22 +60,22 @@ public class BinLogApplicationRunner {
             client.registerLifecycleListener(new BinaryLogClient.LifecycleListener() {
                 @Override
                 public void onConnect(BinaryLogClient client) {
-                    log.info("connect success");
+                    logger.info("connect success");
                 }
 
                 @Override
                 public void onCommunicationFailure(BinaryLogClient client, Exception ex) {
-                    log.error("communication fail", ex);
+                    logger.error("communication fail", ex);
                 }
 
                 @Override
                 public void onEventDeserializationFailure(BinaryLogClient client, Exception ex) {
-                    log.error("event deserialization fail", ex);
+                    logger.error("event deserialization fail", ex);
                 }
 
                 @Override
                 public void onDisconnect(BinaryLogClient client) {
-                    log.warn("disconnect");
+                    logger.warn("disconnect");
                 }
             });
             // 设置server id
@@ -79,9 +84,10 @@ public class BinLogApplicationRunner {
             configBinaryLogStatus(client);
             // 启动连接
             try {
+            	BinaryLogConfig.setRun(true);
                 client.connect();
             } catch (Exception e) {
-                log.error("连接失败，{}", e.getMessage());
+                logger.error("连接失败，{}", e.getMessage());
                 client.setBinlogFilename(null);
                 client.setBinlogPosition(0);
                 initBinaryLogStatus();
@@ -90,34 +96,63 @@ public class BinLogApplicationRunner {
 					client.disconnect();
 	                client.connect();
 				} catch (Exception e1) {
-					log.error("重连失败，{}", e1.getMessage());
+					logger.error("重连失败，{}", e1.getMessage());
 				}
             }
         });
     }
 	
-	/*private void resetBinaryLogStatus() {
-		logStatusSync.updateBinaryLogStatus(BinaryLogConfig.getServerId(), null, 0L);
-	}*/
+	public boolean isConnected() {
+		return null!= client && client.isConnected();
+	}
+	
+	public void disconnect() {
+		try {
+			if(null != client) {
+				client.disconnect();
+			}
+		} catch (IOException e) {
+			logger.error("断开失败，{}", e.getMessage());
+		}
+	}
+	
+	public void connect() {
+		try {
+			if(null != client) {
+				client.connect();
+			}
+		} catch (IOException e) {
+			logger.error("重连失败，{}", e.getMessage());
+		}
+	}
 	
 	private void initBinaryLogStatus() {
 		logStatusSync.initBinaryLogStatus(BinaryLogConfig.getServerId());
 	}
 
-    /**
-     * 配置当前binlog位置
-     * @param client
-     */
+	/**
+	 * 配置当前binlog位置
+	 * @param client
+	 */
 	private void configBinaryLogStatus(BinaryLogClient client) {
-		Map<String, String> binLogStatus = logStatusSync.getBinaryLogStatus(client.getServerId());
+		LogStatus binLogStatus = logStatusSync.getBinaryLogStatus(client.getServerId());
 		if (binLogStatus != null) {
-			String binlogFilename = binLogStatus.get("binlogFilename");
-			if (binlogFilename != null) {
+			String binlogFilename = binLogStatus.getBinlogFilename();
+			if (binlogFilename != null && !binlogFilename.equalsIgnoreCase("null")) {
 				client.setBinlogFilename(binlogFilename);
 			}
-			String binlogPosition = binLogStatus.get("binlogPosition");
+			Long binlogPosition = binLogStatus.getBinlogPosition();
 			if (binlogPosition != null) {
-				client.setBinlogPosition(Long.parseLong(binlogPosition));
+				client.setBinlogPosition(binlogPosition);
+			}
+		}
+	}
+
+	public void destory() {
+		if(null != client) {
+			try {
+				client.disconnect();
+			} catch (IOException e) {
 			}
 		}
 	}

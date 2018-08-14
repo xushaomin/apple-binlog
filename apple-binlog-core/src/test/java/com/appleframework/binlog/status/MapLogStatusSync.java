@@ -5,30 +5,35 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.appleframework.binlog.model.LogStatus;
+
 @Service
 public class MapLogStatusSync implements LogStatusSync {
 
-	private static Map<String, String> map = new HashMap<>();
+	private static Map<Long, LogStatus> map = new HashMap<>();
 	
 	@Override
 	public void updateBinaryLogStatus(Long serverId, Long binlogPosition) {
-		map.put("binlogPosition", binlogPosition.toString());
+		System.out.println("----------reg" + binlogPosition);
+		LogStatus logStatus = map.get(serverId);
+		logStatus.setBinlogPosition(binlogPosition);
 	}
 
 	@Override
 	public void updateBinaryLogStatus(Long serverId, String binlogFilename, Long binlogPosition) {
-		map.put("binlogFilename", binlogFilename);
-		map.put("binlogPosition", binlogPosition.toString());
+		LogStatus logStatus = map.get(serverId);
+		logStatus.setBinlogPosition(binlogPosition);
+		logStatus.setBinlogFilename(binlogFilename);
 	}
 
 	@Override
-	public Map<String, String> getBinaryLogStatus(Long serverId) {
-		return map;
+	public LogStatus getBinaryLogStatus(Long serverId) {
+		return map.get(serverId);
 	}
 
 	@Override
 	public void initBinaryLogStatus(Long serverId) {
-		map.clear();
+		//map.clear();
 	}
 	
 }

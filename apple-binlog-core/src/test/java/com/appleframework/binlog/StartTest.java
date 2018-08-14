@@ -17,6 +17,7 @@ public class StartTest {
 	
 	@Resource
 	private BinLogApplicationRunner binLogApplicationRunner;
+	
 	@Test
 	public void testAddOpinion1() {
 		try {
@@ -26,9 +27,11 @@ public class StartTest {
 			BinaryLogConfig.setUsername("root");
 			BinaryLogConfig.setPassword("bykj@2017~");
 			BinaryLogConfig.setServerId(123456L);
-
+			
 			binLogApplicationRunner.run();
-			System.in.read();
+			
+			
+			
 		} catch(Exception e) {
 			e.printStackTrace();
 		} 

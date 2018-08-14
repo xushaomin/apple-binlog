@@ -7,7 +7,8 @@ public class BinaryLogConfig {
 	private static String username;
 	private static String password;
 	private static Long serverId = 2L;
-	private static Boolean init = false;
+	private static boolean init = false;
+	private static boolean run = false;
 
 	public static String getHost() {
 		return host;
@@ -49,11 +50,20 @@ public class BinaryLogConfig {
 		BinaryLogConfig.serverId = serverId;
 	}
 
-	public static Boolean getInit() {
+	public static boolean isInit() {
 		return init;
 	}
 
-	public static void setInit(Boolean init) {
+	public static void setInit(boolean init) {
 		BinaryLogConfig.init = init;
 	}
+
+	public static boolean isRun() {
+		return run;
+	}
+
+	public static void setRun(boolean run) {
+		BinaryLogConfig.run = run;
+	}
+	
 }
