@@ -63,7 +63,6 @@ public class ZkApplicationRunner implements ApplicationRunner {
 	@Override
 	public void connect() {
 		applicationRunner.connect();
-
 	}
 
 	@Override
