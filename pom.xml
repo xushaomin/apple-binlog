@@ -6,7 +6,7 @@
 
 	<groupId>com.appleframework.binlog</groupId>
 	<artifactId>apple-binlog</artifactId>
-	<version>0.1.7.RELEASE</version>
+	<version>0.1.8.RELEASE</version>
 	<packaging>pom</packaging>
 
 	<name>apple-binlog</name>

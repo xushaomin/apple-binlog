@@ -7,8 +7,12 @@ public class BinaryLogConfig {
 	private static String username;
 	private static String password;
 	private static Long serverId = 2L;
-	private static boolean init = false;
+	
 	private static boolean run = false;
+	
+	private static boolean binLogInit = false;
+	private static String binlogFilename = null;
+	private static Long binlogPosition = null;
 
 	public static String getHost() {
 		return host;
@@ -50,20 +54,36 @@ public class BinaryLogConfig {
 		BinaryLogConfig.serverId = serverId;
 	}
 
-	public static boolean isInit() {
-		return init;
-	}
-
-	public static void setInit(boolean init) {
-		BinaryLogConfig.init = init;
-	}
-
 	public static boolean isRun() {
 		return run;
 	}
 
 	public static void setRun(boolean run) {
 		BinaryLogConfig.run = run;
+	}
+
+	public static boolean isBinLogInit() {
+		return binLogInit;
+	}
+
+	public static void setBinLogInit(boolean binLogInit) {
+		BinaryLogConfig.binLogInit = binLogInit;
+	}
+
+	public static String getBinlogFilename() {
+		return binlogFilename;
+	}
+
+	public static void setBinlogFilename(String binlogFilename) {
+		BinaryLogConfig.binlogFilename = binlogFilename;
+	}
+
+	public static Long getBinlogPosition() {
+		return binlogPosition;
+	}
+
+	public static void setBinlogPosition(Long binlogPosition) {
+		BinaryLogConfig.binlogPosition = binlogPosition;
 	}
 	
 }

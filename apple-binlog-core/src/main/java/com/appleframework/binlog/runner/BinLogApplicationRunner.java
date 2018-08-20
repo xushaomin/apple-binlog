@@ -42,7 +42,7 @@ public class BinLogApplicationRunner implements ApplicationRunner {
 	private BinaryLogClient client;
 
 	public void run() {
-		if(BinaryLogConfig.isInit()) {
+		if(BinaryLogConfig.isBinLogInit()) {
 			initBinaryLogStatus();
 		}
         // 在线程中启动事件监听
@@ -127,7 +127,13 @@ public class BinLogApplicationRunner implements ApplicationRunner {
 	}
 	
 	private void initBinaryLogStatus() {
-		logStatusSync.initBinaryLogStatus(BinaryLogConfig.getServerId());
+		if(null != BinaryLogConfig.getBinlogFilename() && null != BinaryLogConfig.getBinlogPosition()) {
+			logStatusSync.updateBinaryLogStatus(BinaryLogConfig.getServerId(), 
+					BinaryLogConfig.getBinlogFilename(), BinaryLogConfig.getBinlogPosition());
+		}
+		else {
+			logStatusSync.initBinaryLogStatus(BinaryLogConfig.getServerId());
+		}
 	}
 
 	/**
