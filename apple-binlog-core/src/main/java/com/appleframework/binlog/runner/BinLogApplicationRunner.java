@@ -127,6 +127,8 @@ public class BinLogApplicationRunner implements ApplicationRunner {
 	}
 	
 	private void initBinaryLogStatus() {
+		logger.info("init binary log status,fileName={},position={}", 
+				BinaryLogConfig.getBinlogFilename(),BinaryLogConfig.getBinlogPosition());
 		if(null != BinaryLogConfig.getBinlogFilename() && null != BinaryLogConfig.getBinlogPosition()) {
 			logStatusSync.updateBinaryLogStatus(BinaryLogConfig.getServerId(), 
 					BinaryLogConfig.getBinlogFilename(), BinaryLogConfig.getBinlogPosition());
@@ -141,6 +143,7 @@ public class BinLogApplicationRunner implements ApplicationRunner {
 	 * @param client
 	 */
 	private void configBinaryLogStatus(BinaryLogClient client) {
+		logger.info("config binary log status ...");
 		LogStatus binLogStatus = logStatusSync.getBinaryLogStatus(client.getServerId());
 		if (binLogStatus != null) {
 			String binlogFilename = binLogStatus.getBinlogFilename();
@@ -151,6 +154,10 @@ public class BinLogApplicationRunner implements ApplicationRunner {
 			if (binlogPosition != null) {
 				client.setBinlogPosition(binlogPosition);
 			}
+			logger.info("config binary log status, fileName={},position={}", binlogFilename, binlogPosition);
+		}
+		else {
+			logger.info("config binary log status is null ");
 		}
 	}
 
