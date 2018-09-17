@@ -47,6 +47,7 @@ public class LocalDataPublisherImpl implements DataPublisher {
 					for (UpdateRow updateRow : list) {
 						ProducerDataDTO dto = new ProducerDataDTO(DatabaseEvent.UPDATE_ROWS, database, table);
 						dto.setData(updateRow.getAfterRowMap());
+						dto.setBefore(updateRow.getBeforeRowMap());
 						dataProducer.produce(dto);
 					}
 				} else if (data instanceof WriteRowsDTO) {

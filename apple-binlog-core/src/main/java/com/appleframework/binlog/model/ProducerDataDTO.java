@@ -9,6 +9,7 @@ public class ProducerDataDTO extends EventBaseDTO {
 	
 	private static final long serialVersionUID = 1L;
 
+	private Map<String, Serializable> before;
 	private Map<String, Serializable> data;
 
 	public ProducerDataDTO() {
@@ -29,6 +30,14 @@ public class ProducerDataDTO extends EventBaseDTO {
 
 	public void setData(Map<String, Serializable> data) {
 		this.data = data;
+	}
+
+	public Map<String, Serializable> getBefore() {
+		return before;
+	}
+
+	public void setBefore(Map<String, Serializable> before) {
+		this.before = before;
 	}
     
 }
