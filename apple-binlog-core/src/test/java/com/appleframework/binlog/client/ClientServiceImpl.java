@@ -43,5 +43,10 @@ public class ClientServiceImpl implements ClientService {
 	public boolean isExistClient(ClientInfo clientInfo) {
 		return set.contains(clientInfo);
 	}
+
+	@Override
+	public void clearClient() {
+		set.clear();
+	}
 	
 }

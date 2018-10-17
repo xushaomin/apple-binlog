@@ -13,11 +13,18 @@ public interface ClientService {
     void addClient(ClientInfo clientInfo);
 
     /**
-     * 列出正常队列
+     * 列出数据
      *
      * @return
      */
     Set<ClientInfo> listClient();
+    
+    /**
+     * 清除数据
+     *
+     * @return
+     */
+    void clearClient();
     
     /**
      * 删除服务器端及本地client信息

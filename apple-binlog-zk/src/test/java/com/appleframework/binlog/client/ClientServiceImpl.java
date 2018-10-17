@@ -44,6 +44,9 @@ public class ClientServiceImpl implements ClientService {
 		return set.contains(clientInfo);
 	}
 	
-	
+	@Override
+	public void clearClient() {
+		set.clear();
+	}
 	
 }
