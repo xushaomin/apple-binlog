@@ -29,12 +29,12 @@ public class ZkApplicationRunner implements ApplicationRunner {
 			while (true) {
 				// 第一步leader验证
 				if (!zkClient.hasLeadership()) {
-					logger.info("当前服务不是Leader");
+					logger.debug("当前服务不是Leader");
 					if (applicationRunner.isConnected()) {
 						applicationRunner.disconnect();
 					}
 				} else {
-					logger.info("当前服务是Leader");
+					logger.debug("当前服务是Leader");
 					if (BinaryLogConfig.isRun()) {
 						if (!applicationRunner.isConnected()) {
 							applicationRunner.connect();
