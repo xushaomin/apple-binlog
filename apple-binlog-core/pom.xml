@@ -6,14 +6,13 @@
 	<parent>
 		<groupId>com.appleframework.binlog</groupId>
 		<artifactId>apple-binlog</artifactId>
-		<version>0.2.1.RELEASE</version>
+		<version>0.2.2.RELEASE</version>
 	</parent>
 	<artifactId>apple-binlog-core</artifactId>
 	<name>apple-binlog-core</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
-		<binlog.version>0.16.1</binlog.version>
 		<tomcat.version>8.0.53</tomcat.version>
 	</properties>
 	
