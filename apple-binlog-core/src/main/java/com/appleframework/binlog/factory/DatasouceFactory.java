@@ -52,7 +52,7 @@ public class DatasouceFactory implements FactoryBean<DataSource> {
 
 	@Override
 	public boolean isSingleton() {
-		return false;
+		return true;
 	}
 
 	public void destroy() {
