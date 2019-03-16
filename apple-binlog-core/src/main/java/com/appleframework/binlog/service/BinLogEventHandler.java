@@ -1,17 +1,14 @@
 package com.appleframework.binlog.service;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.CollectionUtils;
 
 import com.appleframework.binlog.config.BinaryLogConfig;
-import com.appleframework.binlog.model.ClientInfo;
 import com.appleframework.binlog.model.ColumnsTableMapEventData;
 import com.appleframework.binlog.model.EventBaseDTO;
 import com.appleframework.binlog.pub.DataPublisher;
@@ -49,11 +46,11 @@ public abstract class BinLogEventHandler {
 	 * @param event
 	 */
 	public void handle(Event event) {
-		Set<ClientInfo> clientInfos = filter(event);
-        if (!CollectionUtils.isEmpty(clientInfos)) {
-            publish(formatData(event), clientInfos);
+		EventBaseDTO eventBaseDTO = formatData(event);
+		if(null != eventBaseDTO) {
+			publish(formatData(event));
             updateBinaryLogStatus(event.getHeader());
-        }
+		}
 	}
 
 	/**
@@ -69,10 +66,10 @@ public abstract class BinLogEventHandler {
 	 *
 	 * @param data
 	 */
-	protected void publish(EventBaseDTO data, Set<ClientInfo> clientInfos) {
+	protected void publish(EventBaseDTO data) {
 		if (data != null) {
 			log.debug("推送信息,{}", data);
-			dataPublisher.publish(data, clientInfos);
+			dataPublisher.publish(data);
 		}
 	}
 
@@ -90,7 +87,12 @@ public abstract class BinLogEventHandler {
      * @param event
      * @return
      */
-    protected Set<ClientInfo> filter(Event event) {
-        return clientService.listClient();
+    protected boolean filter(String database, String table) {
+    	if(clientService.isExistClient(database, table)) {
+			return false;
+		}
+    	else {
+    		return true;
+    	}
     }
 }

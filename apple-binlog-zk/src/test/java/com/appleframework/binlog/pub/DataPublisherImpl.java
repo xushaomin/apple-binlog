@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.appleframework.binlog.model.ClientInfo;
 import com.appleframework.binlog.model.EventBaseDTO;
 import com.appleframework.binlog.model.UpdateRow;
 import com.appleframework.binlog.model.UpdateRowsDTO;
@@ -21,7 +20,7 @@ public class DataPublisherImpl implements DataPublisher {
 	}
 
 	@Override
-	public void publish(EventBaseDTO data, Set<ClientInfo> clientInfos) {
+	public void publish(EventBaseDTO data) {
 		String database = data.getDatabase();
 		String table = data.getTable();
 		String key = database + ":" + table;

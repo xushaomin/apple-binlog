@@ -37,5 +37,11 @@ public interface ClientService {
      * @param clientInfo
      */
     boolean isExistClient(ClientInfo clientInfo);
+    
+    /**
+     * 判断服务器端及本地client信息是否存在
+     * @param database, table
+     */
+    boolean isExistClient(String database, String table);
 
 }

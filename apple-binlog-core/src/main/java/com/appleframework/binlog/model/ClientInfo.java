@@ -53,7 +53,8 @@ public class ClientInfo implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(databaseName, tableName);
+    	int hashCode = (databaseName + tableName).hashCode();
+        return Math.abs(hashCode);
     }
 
     @Override

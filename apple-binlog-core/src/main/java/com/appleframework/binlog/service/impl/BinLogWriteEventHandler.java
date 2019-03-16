@@ -22,10 +22,15 @@ public class BinLogWriteEventHandler extends BinLogEventHandler {
     @Override
     protected EventBaseDTO formatData(Event event) {
         WriteRowsEventData d = event.getData();
-        WriteRowsDTO writeRowsDTO = new WriteRowsDTO();
-        writeRowsDTO.setEventType(DatabaseEvent.WRITE_ROWS);
+        
         //添加表信息
         ColumnsTableMapEventData tableMapData = TABLE_MAP_ID.get(d.getTableId());
+        if(filter(tableMapData.getDatabase(), tableMapData.getTable())) {
+        	return null;
+        }
+        
+        WriteRowsDTO writeRowsDTO = new WriteRowsDTO();
+        writeRowsDTO.setEventType(DatabaseEvent.WRITE_ROWS);
         writeRowsDTO.setDatabase(tableMapData.getDatabase());
         writeRowsDTO.setTable(tableMapData.getTable());
         //添加列映射

@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.appleframework.binlog</groupId>
 		<artifactId>apple-binlog</artifactId>
-		<version>0.2.2.RELEASE</version>
+		<version>0.2.3.RELEASE</version>
 	</parent>
 	<artifactId>apple-binlog-core</artifactId>
 	<name>apple-binlog-core</name>

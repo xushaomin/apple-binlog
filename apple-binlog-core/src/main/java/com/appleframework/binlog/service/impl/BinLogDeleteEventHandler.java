@@ -22,10 +22,15 @@ public class BinLogDeleteEventHandler extends BinLogEventHandler {
     @Override
     protected EventBaseDTO formatData(Event event) {
         DeleteRowsEventData d = event.getData();
-        DeleteRowsDTO deleteRowsDTO = new DeleteRowsDTO();
-        deleteRowsDTO.setEventType(DatabaseEvent.DELETE_ROWS);
+        
         //添加表信息
         ColumnsTableMapEventData tableMapData = TABLE_MAP_ID.get(d.getTableId());
+        if(filter(tableMapData.getDatabase(), tableMapData.getTable())) {
+        	return null;
+        }
+        
+        DeleteRowsDTO deleteRowsDTO = new DeleteRowsDTO();
+        deleteRowsDTO.setEventType(DatabaseEvent.DELETE_ROWS);
         deleteRowsDTO.setDatabase(tableMapData.getDatabase());
         deleteRowsDTO.setTable(tableMapData.getTable());
         //添加列映射

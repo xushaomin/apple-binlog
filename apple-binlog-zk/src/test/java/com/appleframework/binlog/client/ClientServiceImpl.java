@@ -48,5 +48,12 @@ public class ClientServiceImpl implements ClientService {
 	public void clearClient() {
 		set.clear();
 	}
+
+	@Override
+	public boolean isExistClient(String database, String table) {
+		return false;
+	}
+	
+	
 	
 }

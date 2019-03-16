@@ -24,10 +24,15 @@ public class BinLogUpdateEventHandler extends BinLogEventHandler {
     @Override
     public EventBaseDTO formatData(Event event) {
         UpdateRowsEventData d = event.getData();
-        UpdateRowsDTO updateRowsDTO = new UpdateRowsDTO();
-        updateRowsDTO.setEventType(DatabaseEvent.UPDATE_ROWS);
+        
         //添加表信息
         ColumnsTableMapEventData tableMapData = TABLE_MAP_ID.get(d.getTableId());
+        if(filter(tableMapData.getDatabase(), tableMapData.getTable())) {
+        	return null;
+        }
+        
+        UpdateRowsDTO updateRowsDTO = new UpdateRowsDTO();
+        updateRowsDTO.setEventType(DatabaseEvent.UPDATE_ROWS);
         updateRowsDTO.setDatabase(tableMapData.getDatabase());
         updateRowsDTO.setTable(tableMapData.getTable());
         //添加列映射
