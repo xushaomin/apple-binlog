@@ -31,6 +31,9 @@ public class BinLogTableMapEventHandler extends BinLogEventHandler {
         //如果表结构有变化，重新设置映射信息
         if (tableMapEventData == null || !ColumnsTableMapEventData.checkEqual(d, tableMapEventData)) {
             log.warn("更新表映射：{} : {} : {}", d.getTableId(), d.getDatabase(), d.getTable());
+            /*if(filter(d.getDatabase(), d.getTable())) {
+            	return;
+            }*/
             ColumnsTableMapEventData data = new ColumnsTableMapEventData(d);
             String sql = "show columns from `" + d.getTable() + "` from `" + d.getDatabase() + "`";
             try (Connection conn = dataSource.getConnection();
