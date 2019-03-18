@@ -14,9 +14,9 @@ public class BinLogDefaultEventHandler extends BinLogEventHandler {
     private static final Logger log = LoggerFactory.getLogger(BinLogDefaultEventHandler.class);
 
     @Override
-    public void handle(Event event) {
+	public void handle(Event event) {
 		log.debug("跳过不处理事件event:{}", event);
-    }
+	}
 
 	@Override
 	protected EventBaseDTO formatData(Event event) {

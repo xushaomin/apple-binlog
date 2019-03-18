@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Resource;
+import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,7 @@ public abstract class BinLogEventHandler {
 	private static final Logger log = LoggerFactory.getLogger(BinLogWriteEventHandler.class);
 
 	protected final static Map<Long, ColumnsTableMapEventData> TABLE_MAP_ID = new ConcurrentHashMap<>();
-
+		
 	@Resource
 	protected LogStatusSync logStatusSync;
 
@@ -31,13 +32,32 @@ public abstract class BinLogEventHandler {
 	
 	@Resource
 	protected ClientService clientService;
+	
+	@Resource
+	protected DataSource dataSource;
+		
+	protected ColumnsTableMapEventData getTableMap(Long tableId) {
+		ColumnsTableMapEventData data = TABLE_MAP_ID.get(tableId);
+		if (null == data) {
+			log.info("tableId为{}的表映射数据不存在", tableId);
+		}
+		return data;
+	}
 
+	protected void setTableMap(Long tableId, ColumnsTableMapEventData data) {
+		TABLE_MAP_ID.put(tableId, data);
+	}
+	
 	public void setDataPublisher(DataPublisher dataPublisher) {
 		this.dataPublisher = dataPublisher;
 	}
 
 	public void setLogStatusSync(LogStatusSync logStatusSync) {
 		this.logStatusSync = logStatusSync;
+	}
+	
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
 	}
 
 	/**
@@ -49,7 +69,7 @@ public abstract class BinLogEventHandler {
 		EventBaseDTO eventBaseDTO = formatData(event);
 		if(null != eventBaseDTO) {
 			publish(formatData(event));
-            updateBinaryLogStatus(event.getHeader());
+			updateBinaryLogStatus(event.getHeader());
 		}
 	}
 

@@ -24,7 +24,7 @@ public class BinLogWriteEventHandler extends BinLogEventHandler {
         WriteRowsEventData d = event.getData();
         
         //添加表信息
-        ColumnsTableMapEventData tableMapData = TABLE_MAP_ID.get(d.getTableId());
+        ColumnsTableMapEventData tableMapData = getTableMap(d.getTableId());
         if(filter(tableMapData.getDatabase(), tableMapData.getTable())) {
         	return null;
         }
