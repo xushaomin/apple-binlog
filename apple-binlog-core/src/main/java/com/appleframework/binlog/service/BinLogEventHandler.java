@@ -43,6 +43,10 @@ public abstract class BinLogEventHandler {
 		}
 		return data;
 	}
+	
+	protected ColumnsTableMapEventData getTableMap2(Long tableId) {
+		return TABLE_MAP_ID.get(tableId);
+	}
 
 	protected void setTableMap(Long tableId, ColumnsTableMapEventData data) {
 		TABLE_MAP_ID.put(tableId, data);

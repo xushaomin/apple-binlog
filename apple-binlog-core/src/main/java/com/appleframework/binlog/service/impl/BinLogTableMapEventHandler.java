@@ -27,7 +27,7 @@ public class BinLogTableMapEventHandler extends BinLogEventHandler {
     public void handle(Event event) {
         TableMapEventData d = event.getData();
         log.debug("TableMapEventData:{}", d);
-        ColumnsTableMapEventData tableMapEventData = getTableMap(d.getTableId());
+        ColumnsTableMapEventData tableMapEventData = getTableMap2(d.getTableId());
         //如果表结构有变化，重新设置映射信息
         if (tableMapEventData == null || !ColumnsTableMapEventData.checkEqual(d, tableMapEventData)) {
             log.info("更新表映射：{} : {}", d.getDatabase(), d.getTable());
