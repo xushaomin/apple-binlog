@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.appleframework.binlog</groupId>
 	<artifactId>apple-binlog</artifactId>
-	<version>0.2.3-SNAPSHOT</version>
+	<version>0.2.3.RELEASE</version>
 	<packaging>pom</packaging>
 
 	<name>apple-binlog</name>
