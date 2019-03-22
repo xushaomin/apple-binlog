@@ -51,9 +51,8 @@ public class ClientServiceImpl implements ClientService {
 
 	@Override
 	public boolean isExistClient(String database, String table) {
-		return false;
+		return set.contains(new ClientInfo(database, table));
 	}
-	
 	
 	
 }
