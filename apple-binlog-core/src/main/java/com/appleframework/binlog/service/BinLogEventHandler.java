@@ -72,7 +72,7 @@ public abstract class BinLogEventHandler {
 	public void handle(Event event) {
 		EventBaseDTO eventBaseDTO = formatData(event);
 		if(null != eventBaseDTO) {
-			publish(formatData(event));
+			publish(eventBaseDTO);
 			updateBinaryLogStatus(event.getHeader());
 		}
 	}

@@ -48,8 +48,7 @@
 		<!-- 验证失败时，是否将连接从池中丢弃 -->
 		<property name="testWhileIdle" value="true" />
 		<!-- 把空闲时间超过minEvictableIdleTimeMillis毫秒的连接断开, 直到连接池中的连接数到minIdle为止(毫秒，30分钟) -->
-		<property name="timeBetweenEvictionRunsMillis"
-			value="1200000" />
+		<property name="timeBetweenEvictionRunsMillis" value="1200000" />
 		<!-- 连接池中连接可空闲的时间（毫秒，5分钟） -->
 		<property name="minEvictableIdleTimeMillis" value="1800000" />
 		<!-- 在每次空闲连接回收器线程(如果有)运行时检查的连接数量 -->

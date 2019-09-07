@@ -40,8 +40,11 @@ public class BinLogApplicationRunner implements ApplicationRunner {
 	}
 	
 	private BinaryLogClient client;
-
+	
 	public void run() {
+		if (BinaryLogConfig.isRun()) {
+            throw new IllegalStateException("binlog监控正在运行...");
+        }
 		if(BinaryLogConfig.isBinLogInit()) {
 			initBinaryLogStatus();
 		}
@@ -98,6 +101,7 @@ public class BinLogApplicationRunner implements ApplicationRunner {
 				} catch (Exception e1) {
 					logger.error("重连失败，{}", e1.getMessage());
 				}
+                BinaryLogConfig.setRun(false);
             }
         });
     }
@@ -168,6 +172,7 @@ public class BinLogApplicationRunner implements ApplicationRunner {
 			} catch (IOException e) {
 			}
 		}
+		BinaryLogConfig.setRun(false);
 	}
 
 }
