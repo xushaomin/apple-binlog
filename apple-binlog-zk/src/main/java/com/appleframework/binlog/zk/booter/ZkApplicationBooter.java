@@ -19,6 +19,8 @@ public class ZkApplicationBooter implements ApplicationBooter {
 	public void setApplicationRunner(ApplicationRunner applicationRunner) {
 		this.applicationRunner = applicationRunner;
 	}
+	
+    private boolean isRun = false;
 
 	@Override
 	public void run() {
@@ -41,14 +43,21 @@ public class ZkApplicationBooter implements ApplicationBooter {
 							applicationRunner.connect();
 						}
 					} else {
-						Thread t = new Thread(new Runnable() {
-	                        @Override
-	                        public void run() {
-	                        	applicationRunner.run();
-	                        }
-	                    });
-	                    t.setDaemon(true);
-	                    t.start();
+						if(isRun) {
+							applicationRunner.connect();
+						}
+						else {
+							Thread t = new Thread(new Runnable() {
+		                        @Override
+		                        public void run() {
+		                        	isRun = true;
+		                        	applicationRunner.run();
+		                        }
+		                    });
+							t.setName("sync-binlog-booter");
+		                    t.setDaemon(true);
+		                    t.start();
+						}
 					}
 				}
 				Thread.sleep(1000);
