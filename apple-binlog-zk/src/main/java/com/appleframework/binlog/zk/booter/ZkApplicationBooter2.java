@@ -31,8 +31,8 @@ public class ZkApplicationBooter2 implements ApplicationBooter {
 	 * 是否有领导权
 	 */
 	private boolean hasLeadership() {
-		if (zkClient.getLeader() != null) {
-			return zkClient.getLeader().hasLeadership();
+		if (zkClient != null) {
+			return zkClient.hasLeadership();
 		}
 		return false;
 	}
@@ -67,14 +67,15 @@ public class ZkApplicationBooter2 implements ApplicationBooter {
 						public void run() {
 							if (zkClient.getLeader() != null) {
 								// 为了让出领导权，让其他节点有足够的时间获取领导权
+								int sheepTime = ZkConfig.getZkClientInfo().getRetrySleepTime();
 								try {
-									Thread.sleep(10000);
+									Thread.sleep(sheepTime);
 								} catch (InterruptedException e) {
 									logger.error(e.getMessage());
 								}
 								// 如果程序已经在停止了，就不参与竞选了
 								if (!isDestory) {
-									logger.info("休眠10秒之后节点再次开始竞选Leader...");
+									logger.info("休眠{}秒之后节点再次开始竞选Leader...", sheepTime);
 									zkClient.getLeader().requeue();
 								}
 							}

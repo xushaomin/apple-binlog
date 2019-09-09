@@ -24,7 +24,6 @@ public class ZkClientSelector {
 		if (!client.isStarted()) {
 			client.start();
 		}
-
 		leader.start();
 	}
 

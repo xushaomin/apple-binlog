@@ -25,7 +25,6 @@ public class ZkClientLatch {
 		if (!client.isStarted()) {
 			client.start();
 		}
-
 		leader.start();
 	}
 
