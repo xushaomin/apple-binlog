@@ -1,4 +1,4 @@
-package com.appleframework.binlog.zk.runner;
+package com.appleframework.binlog.zk.booter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
