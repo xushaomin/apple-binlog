@@ -41,7 +41,7 @@ public class ZkApplicationBooter implements ApplicationBooter {
     }
     
     private void threadStop() {
-    	logger.info("当前服务不是Leader, 停止所有");
+    	logger.debug("当前服务不是Leader, 停止所有");
     	if(applicationRunner.isRun()) {
     		applicationRunner.destory();
     	}
@@ -62,15 +62,13 @@ public class ZkApplicationBooter implements ApplicationBooter {
 			logger.info("zk客户端连接成功");
 			Thread.sleep(100);
 			while (true) {
-				// 第一步leader验证
-				logger.info("--------------------");
 				if (!zkClient.hasLeadership()) {
-					logger.info("当前服务不是Leader");
+					logger.debug("当前服务不是Leader");
 					threadStop();
 				} else {
-					logger.info("当前服务是Leader");
+					logger.debug("当前服务是Leader");
 					if(!isThreadExist()) {
-						logger.info("当前服务是Leader，线程重新启动");
+						logger.debug("当前服务是Leader，线程不存在，重新启动");
 						this.threadStart();
 					}
 					else {

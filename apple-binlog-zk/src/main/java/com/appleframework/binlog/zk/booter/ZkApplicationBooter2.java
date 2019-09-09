@@ -26,6 +26,8 @@ public class ZkApplicationBooter2 implements ApplicationBooter {
 	}
 
 	private ZkClientSelector zkClient;
+	
+	private Thread thread;
 
 	/**
 	 * 是否有领导权
@@ -44,12 +46,43 @@ public class ZkApplicationBooter2 implements ApplicationBooter {
 		logger.warn("主动放弃领导权...");
 		applicationRunner.disconnect();
 	}
+	
+	/**
+	 * 启动线程，判断程序是否健康，不健康退出选举
+	 */
+	private void requeue() {
+		if(null == thread) {
+			thread = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					if (zkClient.getLeader() != null) {
+						// 为了让出领导权，让其他节点有足够的时间获取领导权
+						int sheepTime = ZkConfig.getZkClientInfo().getRetrySleepTime();
+						try {
+							Thread.sleep(sheepTime);
+						} catch (InterruptedException e) {
+							logger.error(e.getMessage());
+						}
+						// 如果程序已经在停止了，就不参与竞选了
+						if (!isDestory) {
+							logger.info("休眠{}秒之后节点再次开始竞选Leader...", sheepTime);
+							zkClient.getLeader().requeue();
+						}
+					}
+				}
+			});
+			thread.setName("zk-application-booter");
+			thread.setDaemon(true);
+			thread.start();
+		}
+	}
 
 	@Override
 	public void run() {
 		logger.warn("开始竞选Leader...");
 		try {
 			LeaderSelectorListener listener = new LeaderSelectorListenerAdapter() {
+				
 				@Override
 				public void takeLeadership(CuratorFramework client) throws Exception {
 					logger.warn("当前节点成功竞选为Leader，开始启动BinLog监听...");
@@ -62,29 +95,7 @@ public class ZkApplicationBooter2 implements ApplicationBooter {
 						relinquished();
 					}
 
-					Thread t = new Thread(new Runnable() {
-						@Override
-						public void run() {
-							if (zkClient.getLeader() != null) {
-								// 为了让出领导权，让其他节点有足够的时间获取领导权
-								int sheepTime = ZkConfig.getZkClientInfo().getRetrySleepTime();
-								try {
-									Thread.sleep(sheepTime);
-								} catch (InterruptedException e) {
-									logger.error(e.getMessage());
-								}
-								// 如果程序已经在停止了，就不参与竞选了
-								if (!isDestory) {
-									logger.info("休眠{}秒之后节点再次开始竞选Leader...", sheepTime);
-									zkClient.getLeader().requeue();
-								}
-							}
-						}
-					});
-					t.setName("zk-application-booter");
-					t.setDaemon(true);
-					t.start();
-					logger.warn("当前节点放弃领导权");
+					requeue();
 				}
 
 				@Override
@@ -97,11 +108,12 @@ public class ZkApplicationBooter2 implements ApplicationBooter {
 						}
 					}
 				}
+				
 			};
 			zkClient = ZkClientUtil.getZkClient(ZkConfig.getZkClientInfo(), listener);
 		} catch (Exception e) {
-			logger.error("启动异常，程序退出！", e);
-			System.exit(1);
+			logger.error("启动异常！", e);
+			destory();
 		}
 	}
 
