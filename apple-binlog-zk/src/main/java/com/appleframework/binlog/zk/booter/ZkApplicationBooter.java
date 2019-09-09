@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.appleframework.binlog.booter.ApplicationBooter;
-import com.appleframework.binlog.config.BinaryLogConfig;
 import com.appleframework.binlog.runner.ApplicationRunner;
 import com.appleframework.binlog.zk.config.ZkConfig;
 import com.appleframework.binlog.zk.election.ZkClientLatch;
@@ -19,8 +18,28 @@ public class ZkApplicationBooter implements ApplicationBooter {
 	public void setApplicationRunner(ApplicationRunner applicationRunner) {
 		this.applicationRunner = applicationRunner;
 	}
-	
-    private boolean isRun = false;
+    
+    private Thread thread = null;
+    
+    private void threadRun() {
+		thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+            	try {
+            		applicationRunner.run();
+				} catch (Exception e) {
+					logger.error("BinLog监听异常", e);
+				} finally {
+					logger.warn("主动放弃领导权...");
+					applicationRunner.destory();
+					thread.interrupt();
+				}
+            }
+        });
+		thread.setName("zk-application-booter");
+		thread.setDaemon(true);
+		thread.start();
+    }
 
 	@Override
 	public void run() {
@@ -32,38 +51,31 @@ public class ZkApplicationBooter implements ApplicationBooter {
 			while (true) {
 				// 第一步leader验证
 				if (!zkClient.hasLeadership()) {
-					logger.debug("当前服务不是Leader");
-					if (BinaryLogConfig.isRun()) {
+					logger.info("当前服务不是Leader");
+					if(null != thread && thread.isAlive() && applicationRunner.isRun()) {
 						applicationRunner.destory();
+						thread = null;
+						logger.info("当前服务不是Leader, 线程被初始化为空");
 					}
 				} else {
-					logger.debug("当前服务是Leader");
-					if (BinaryLogConfig.isRun()) {
-						if (!applicationRunner.isConnected()) {
-							applicationRunner.connect();
-						}
-					} else {
-						if(isRun) {
-							applicationRunner.connect();
+					logger.info("当前服务是Leader");
+					if(null == thread) {
+						logger.info("当前服务是Leader，线程重新启动");
+						this.threadRun();
+					}
+					else {
+						if(thread.isAlive()) {
+							if(applicationRunner.isRun()) {
+								if (!applicationRunner.isConnected()) {
+									applicationRunner.connect();
+								}
+							}
+							else {
+								applicationRunner.run();
+							}
 						}
 						else {
-							Thread t = new Thread(new Runnable() {
-		                        @Override
-		                        public void run() {
-		                        	isRun = true;
-		                        	try {
-		                        		applicationRunner.run();
-									} catch (Exception e) {
-										logger.error("BinLog监听异常", e);
-									} finally {
-										logger.warn("主动放弃领导权...");
-										applicationRunner.disconnect();
-									}
-		                        }
-		                    });
-							t.setName("zk-application-booter");
-		                    t.setDaemon(true);
-		                    t.start();
+							thread = null;
 						}
 					}
 				}

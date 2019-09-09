@@ -161,6 +161,7 @@ public class BinLogApplicationRunner implements ApplicationRunner {
         if (null != client) {
             try {
                 client.disconnect();
+                BinaryLogConfig.setRun(false);
             } catch (IOException e) {
             }
         }
