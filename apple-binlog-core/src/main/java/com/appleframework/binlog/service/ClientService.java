@@ -5,6 +5,7 @@ import java.util.Set;
 import com.appleframework.binlog.model.ClientInfo;
 
 public interface ClientService {
+	
     /**
      * 添加服务器端及本地client信息
      *

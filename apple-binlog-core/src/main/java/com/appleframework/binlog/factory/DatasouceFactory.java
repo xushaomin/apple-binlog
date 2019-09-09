@@ -31,6 +31,10 @@ public class DatasouceFactory implements FactoryBean<DataSource> {
 		dataSource.setMinIdle(1);
 		dataSource.setMaxIdle(5);
 		dataSource.setMaxActive(10);
+		dataSource.setTestOnBorrow(true);
+		dataSource.setTimeBetweenEvictionRunsMillis(60000);
+		dataSource.setMinEvictableIdleTimeMillis(600000);
+		dataSource.setValidationQuery("select 1");
 		// test();
 		return dataSource;
 	}

@@ -3,15 +3,16 @@ package com.appleframework.binlog.zk.runner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.appleframework.binlog.booter.ApplicationBooter;
 import com.appleframework.binlog.config.BinaryLogConfig;
 import com.appleframework.binlog.runner.ApplicationRunner;
 import com.appleframework.binlog.zk.config.ZkConfig;
 import com.appleframework.binlog.zk.election.ZkClient;
 import com.appleframework.binlog.zk.election.ZkClientUtil;
 
-public class ZkApplicationRunner implements ApplicationRunner {
+public class ZkApplicationBooter implements ApplicationBooter {
 
-	private static final Logger logger = LoggerFactory.getLogger(ZkApplicationRunner.class);
+	private static final Logger logger = LoggerFactory.getLogger(ZkApplicationBooter.class);
 
 	private ApplicationRunner applicationRunner;
 
@@ -30,8 +31,8 @@ public class ZkApplicationRunner implements ApplicationRunner {
 				// 第一步leader验证
 				if (!zkClient.hasLeadership()) {
 					logger.debug("当前服务不是Leader");
-					if (applicationRunner.isConnected()) {
-						applicationRunner.disconnect();
+					if (BinaryLogConfig.isRun()) {
+						applicationRunner.destory();
 					}
 				} else {
 					logger.debug("当前服务是Leader");
@@ -40,7 +41,14 @@ public class ZkApplicationRunner implements ApplicationRunner {
 							applicationRunner.connect();
 						}
 					} else {
-						applicationRunner.run();
+						Thread t = new Thread(new Runnable() {
+	                        @Override
+	                        public void run() {
+	                        	applicationRunner.run();
+	                        }
+	                    });
+	                    t.setDaemon(true);
+	                    t.start();
 					}
 				}
 				Thread.sleep(1000);
@@ -51,23 +59,13 @@ public class ZkApplicationRunner implements ApplicationRunner {
 	}
 
 	@Override
-	public boolean isConnected() {
-		return applicationRunner.isConnected();
-	}
-
-	@Override
-	public void disconnect() {
-		applicationRunner.disconnect();
-	}
-
-	@Override
-	public void connect() {
-		applicationRunner.connect();
-	}
-
-	@Override
 	public void destory() {
 		applicationRunner.destory();
+	}
+	
+	@Override
+	public boolean isRun() {
+		return applicationRunner.isRun();
 	}
 
 }

@@ -8,20 +8,21 @@ import org.apache.curator.framework.state.ConnectionState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.appleframework.binlog.booter.ApplicationBooter;
 import com.appleframework.binlog.runner.ApplicationRunner;
 import com.appleframework.binlog.zk.config.ZkConfig;
 import com.appleframework.binlog.zk.election.ZkClientInfo;
 import com.appleframework.binlog.zk.election.ZkClientUtil;
 
-public class ZkApplicationRunner2 implements ApplicationRunner {
+public class ZkApplicationBooter2 implements ApplicationBooter {
 
-    private static final Logger logger = LoggerFactory.getLogger(ZkApplicationRunner2.class);
+    private static final Logger logger = LoggerFactory.getLogger(ZkApplicationBooter2.class);
 
     // 用于选举Leader
     private CuratorFramework curatorClient;;
     private LeaderSelector selector;
 
-    private boolean destory = false;
+    private boolean isDestory = false;
 
     private ApplicationRunner applicationRunner;
 
@@ -30,9 +31,9 @@ public class ZkApplicationRunner2 implements ApplicationRunner {
     }
 
     /**
-     * 是否有领导权
-     */
-    public boolean hasLeadership() {
+	* 是否有领导权
+	*/
+    private boolean hasLeadership() {
         if (selector != null) {
             return selector.hasLeadership();
         }
@@ -42,7 +43,7 @@ public class ZkApplicationRunner2 implements ApplicationRunner {
     /**
      * 放弃领导权
      */
-    public void relinquished() {
+    private void relinquished() {
         logger.warn("主动放弃领导权...");
         applicationRunner.disconnect();
     }
@@ -64,14 +65,12 @@ public class ZkApplicationRunner2 implements ApplicationRunner {
                         applicationRunner.run();
                     } catch (Exception e) {
                         logger.error("binlog监听异常", e);
-                        // 放弃领导权，并断开
-                        relinquished();
                     } finally {
-                        applicationRunner.disconnect();
+                    	// 放弃领导权，并断开
+                        relinquished();
                     }
 
                     Thread t = new Thread(new Runnable() {
-
                         @Override
                         public void run() {
                             if (selector != null) {
@@ -82,7 +81,7 @@ public class ZkApplicationRunner2 implements ApplicationRunner {
                                 	logger.error(e.getMessage());
                                 }
                                 // 如果程序已经在停止了，就不参与竞选了
-                                if (!destory) {
+                                if (!isDestory) {
                                     logger.info("休眠10秒之后节点再次开始竞选Leader...");
                                     selector.requeue();
                                 }
@@ -114,24 +113,16 @@ public class ZkApplicationRunner2 implements ApplicationRunner {
     }
 
     @Override
-    public boolean isConnected() {
-        return applicationRunner.isConnected();
-    }
-
-    @Override
-    public void disconnect() {
-        applicationRunner.disconnect();
-    }
-
-    @Override
-    public void connect() {
-        applicationRunner.connect();
-    }
-
-    @Override
     public void destory() {
-        destory = true;
+    	isDestory = true;
         applicationRunner.destory();
     }
+
+	@Override
+	public boolean isRun() {
+		return applicationRunner.isRun();
+	}
+    
+    
 
 }

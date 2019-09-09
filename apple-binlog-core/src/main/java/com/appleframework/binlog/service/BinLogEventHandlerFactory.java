@@ -21,7 +21,7 @@ import com.github.shyiko.mysql.binlog.event.EventType;
 @Service
 public class BinLogEventHandlerFactory {
 
-	private static final Logger log = LoggerFactory.getLogger(BinLogDefaultEventHandler.class);
+	private static final Logger logger = LoggerFactory.getLogger(BinLogDefaultEventHandler.class);
 
 	@Resource
 	private BinLogUpdateEventHandler binLogUpdateEventHandler;
@@ -50,13 +50,13 @@ public class BinLogEventHandlerFactory {
 		} else if (EventType.isDelete(header.getEventType())) {
 			return binLogDeleteEventHandler;
 		} else if (EventType.TABLE_MAP.equals(header.getEventType())) {
-			log.debug("TableMapEvent-header:{}", header);
+			logger.debug("TableMapEvent-header:{}", header);
 			return binLogTableMapEventHandler;
 		} else if (EventType.ROTATE.equals(header.getEventType())) {
-			log.debug("RotateEvent-header:{}", header);
+			logger.debug("RotateEvent-header:{}", header);
 			return binLogRotateEventHandler;
 		} else {
-			log.debug("不处理事件,{}", header);
+			logger.debug("不处理事件,{}", header);
 			return binLogDefaultEventHandler;
 		}
 	}

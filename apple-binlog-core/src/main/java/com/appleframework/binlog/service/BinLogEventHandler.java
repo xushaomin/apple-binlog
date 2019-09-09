@@ -20,7 +20,7 @@ import com.github.shyiko.mysql.binlog.event.EventHeaderV4;
 
 public abstract class BinLogEventHandler {
 
-	private static final Logger log = LoggerFactory.getLogger(BinLogWriteEventHandler.class);
+	private static final Logger logger = LoggerFactory.getLogger(BinLogWriteEventHandler.class);
 
 	protected final static Map<Long, ColumnsTableMapEventData> TABLE_MAP_ID = new ConcurrentHashMap<>();
 		
@@ -39,7 +39,7 @@ public abstract class BinLogEventHandler {
 	protected ColumnsTableMapEventData getTableMap(Long tableId) {
 		ColumnsTableMapEventData data = TABLE_MAP_ID.get(tableId);
 		if (null == data) {
-			log.info("tableId为{}的表映射数据不存在", tableId);
+			logger.info("tableId为{}的表映射数据不存在", tableId);
 		}
 		return data;
 	}
@@ -92,7 +92,7 @@ public abstract class BinLogEventHandler {
 	 */
 	protected void publish(EventBaseDTO data) {
 		if (data != null) {
-			log.debug("推送信息,{}", data);
+			logger.debug("推送信息,{}", data);
 			dataPublisher.publish(data);
 		}
 	}

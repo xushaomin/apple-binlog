@@ -3,6 +3,8 @@ package com.appleframework.binlog.runner;
 public interface ApplicationRunner {
 
 	public void run();
+	
+	public boolean isRun();
 
 	public boolean isConnected();
 
