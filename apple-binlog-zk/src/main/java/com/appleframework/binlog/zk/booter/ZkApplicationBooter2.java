@@ -96,9 +96,7 @@ public class ZkApplicationBooter2 implements ApplicationBooter {
 					}
 				}
 			};
-
 			zkClient = ZkClientUtil.getZkClient(ZkConfig.getZkClientInfo(), listener);
-			zkClient.startZKClient();
 		} catch (Exception e) {
 			logger.error("启动异常，程序退出！", e);
 			System.exit(1);
