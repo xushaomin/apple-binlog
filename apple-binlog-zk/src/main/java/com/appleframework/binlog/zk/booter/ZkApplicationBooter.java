@@ -20,28 +20,38 @@ public class ZkApplicationBooter implements ApplicationBooter {
 	}
     
     private Thread thread = null;
-    
-    private boolean threadRun = true;
-    
-    private void threadRun() {
+        
+    private void threadStart() {
 		thread = new Thread(new Runnable() {
             @Override
             public void run() {
             	try {
-            		threadRun = true;
             		applicationRunner.run();
 				} catch (Exception e) {
 					logger.error("BinLog监听异常", e);
 				} finally {
 					logger.warn("主动放弃领导权...");
 					applicationRunner.destory();
-					threadRun = false;
 				}
             }
         });
 		thread.setName("zk-application-booter");
 		thread.setDaemon(true);
 		thread.start();
+    }
+    
+    private void threadStop() {
+    	logger.info("当前服务不是Leader, 停止所有");
+    	if(applicationRunner.isRun()) {
+    		applicationRunner.destory();
+    	}
+    	if(null != thread) {
+    		thread = null;
+    	}
+    }
+    
+    private boolean isThreadExist() {
+    	return (null == thread) ? false : true;
     }
 
 	@Override
@@ -53,19 +63,15 @@ public class ZkApplicationBooter implements ApplicationBooter {
 			Thread.sleep(100);
 			while (true) {
 				// 第一步leader验证
+				logger.info("--------------------");
 				if (!zkClient.hasLeadership()) {
 					logger.info("当前服务不是Leader");
-					if(null != thread && thread.isAlive() && threadRun && applicationRunner.isRun()) {
-						applicationRunner.destory();
-						threadRun = false;
-						thread = null;
-						logger.info("当前服务不是Leader, 线程被初始化为空");
-					}
+					threadStop();
 				} else {
 					logger.info("当前服务是Leader");
-					if(null == thread) {
+					if(!isThreadExist()) {
 						logger.info("当前服务是Leader，线程重新启动");
-						this.threadRun();
+						this.threadStart();
 					}
 					else {
 						if(thread.isAlive()) {
@@ -74,13 +80,9 @@ public class ZkApplicationBooter implements ApplicationBooter {
 									applicationRunner.connect();
 								}
 							}
-							else {
-								applicationRunner.run();
-							}
-						}
-						else {
-							threadRun = false;
-							thread = null;
+						} else {
+							threadStop();
+							threadStart();
 						}
 					}
 				}
@@ -88,13 +90,12 @@ public class ZkApplicationBooter implements ApplicationBooter {
 			}
 		} catch (Exception e) {
 			logger.error("启动异常，程序退出！", e);
-            System.exit(1);
 		}
 	}
 
 	@Override
 	public void destory() {
-		applicationRunner.destory();
+		threadStop();
 	}
 	
 	@Override
