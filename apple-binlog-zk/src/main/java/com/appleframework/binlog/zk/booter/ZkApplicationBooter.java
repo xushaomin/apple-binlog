@@ -21,18 +21,21 @@ public class ZkApplicationBooter implements ApplicationBooter {
     
     private Thread thread = null;
     
+    private boolean threadRun = true;
+    
     private void threadRun() {
 		thread = new Thread(new Runnable() {
             @Override
             public void run() {
             	try {
+            		threadRun = true;
             		applicationRunner.run();
 				} catch (Exception e) {
 					logger.error("BinLog监听异常", e);
 				} finally {
 					logger.warn("主动放弃领导权...");
 					applicationRunner.destory();
-					thread = null;
+					threadRun = false;
 				}
             }
         });
@@ -52,8 +55,9 @@ public class ZkApplicationBooter implements ApplicationBooter {
 				// 第一步leader验证
 				if (!zkClient.hasLeadership()) {
 					logger.info("当前服务不是Leader");
-					if(null != thread && thread.isAlive() && applicationRunner.isRun()) {
+					if(null != thread && thread.isAlive() && threadRun && applicationRunner.isRun()) {
 						applicationRunner.destory();
+						threadRun = false;
 						thread = null;
 						logger.info("当前服务不是Leader, 线程被初始化为空");
 					}
@@ -75,6 +79,7 @@ public class ZkApplicationBooter implements ApplicationBooter {
 							}
 						}
 						else {
+							threadRun = false;
 							thread = null;
 						}
 					}
