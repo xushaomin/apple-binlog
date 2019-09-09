@@ -32,7 +32,7 @@ public class ZkApplicationBooter implements ApplicationBooter {
 				} finally {
 					logger.warn("主动放弃领导权...");
 					applicationRunner.destory();
-					thread.interrupt();
+					thread = null;
 				}
             }
         });
