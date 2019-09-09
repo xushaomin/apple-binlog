@@ -10,7 +10,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.appleframework.binlog.config.BinaryLogConfig;
 import com.appleframework.binlog.runner.ApplicationRunner;
 import com.appleframework.binlog.zk.config.ZkConfig;
-import com.appleframework.binlog.zk.election.ZkClient;
+import com.appleframework.binlog.zk.election.ZkClientLatch;
 import com.appleframework.binlog.zk.election.ZkClientInfo;
 import com.appleframework.binlog.zk.election.ZkClientUtil;;
 
@@ -43,7 +43,7 @@ public class StartTest {
 		try {
 			
 			
-			ZkClient zkClient = ZkClientUtil.getZkClient(zkClientInfo);
+			ZkClientLatch zkClient = ZkClientUtil.getZkClient(zkClientInfo);
 			
 			ZkConfig.setZkClientInfo(zkClientInfo);
 			System.out.println("zk客户端连接成功");

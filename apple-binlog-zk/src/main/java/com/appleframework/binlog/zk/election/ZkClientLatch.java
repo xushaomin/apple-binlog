@@ -3,13 +3,14 @@ package com.appleframework.binlog.zk.election;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.leader.LeaderLatch;
 
-public class ZkClient {
-	
+public class ZkClientLatch {
+
 	private ZkClientCache cache;
 	private LeaderLatch leader;
+
 	private CuratorFramework client;
 
-	public ZkClient(LeaderLatch leader, CuratorFramework client) {
+	public ZkClientLatch(LeaderLatch leader, CuratorFramework client) {
 		this.client = client;
 		this.leader = leader;
 	}
@@ -21,10 +22,10 @@ public class ZkClient {
 	 */
 	@SuppressWarnings("deprecation")
 	public void startZKClient() throws Exception {
-		if(!client.isStarted()) {
+		if (!client.isStarted()) {
 			client.start();
 		}
-		
+
 		leader.start();
 	}
 
@@ -70,5 +71,5 @@ public class ZkClient {
 	public void setCache(ZkClientCache cache) {
 		this.cache = cache;
 	}
-	
+
 }

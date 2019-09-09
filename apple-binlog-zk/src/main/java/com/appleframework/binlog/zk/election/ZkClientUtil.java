@@ -6,6 +6,8 @@ import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.leader.LeaderLatch;
+import org.apache.curator.framework.recipes.leader.LeaderSelector;
+import org.apache.curator.framework.recipes.leader.LeaderSelectorListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
 import org.slf4j.Logger;
@@ -16,13 +18,14 @@ public class ZkClientUtil {
 	
 	private static final Logger logger = LoggerFactory.getLogger(ZkClientUtil.class);
 	
-	private static ConcurrentHashMap<String, ZkClient> zkClientMap = new ConcurrentHashMap<String, ZkClient>();
+	private static ConcurrentHashMap<String, ZkClientLatch> zkClientLatchMap = new ConcurrentHashMap<String, ZkClientLatch>();
+	private static ConcurrentHashMap<String, ZkClientSelector> zkClientSelectorMap = new ConcurrentHashMap<String, ZkClientSelector>();
 	private static ConcurrentHashMap<String, CuratorFramework> cfClientMap = new ConcurrentHashMap<String, CuratorFramework>();
 	
-	public static ZkClient getZkClient(ZkClientInfo zkClientInfo) throws Exception {
-		ZkClient zkClient = zkClientMap.get(zkClientInfo.getId());
+	public static ZkClientLatch getZkClient(ZkClientInfo zkClientInfo) throws Exception {
+		ZkClientLatch zkClient = zkClientLatchMap.get(zkClientInfo.getId());
 		if(null == zkClient) {
-			synchronized (ZkClient.class) {
+			synchronized (ZkClientLatch.class) {
 				CuratorFramework cfClient = getCuratorClient(zkClientInfo);
 				LeaderLatch leaderLatch = new LeaderLatch(cfClient, zkClientInfo.getLeaderPath(), zkClientInfo.getId(),
 						LeaderLatch.CloseMode.NOTIFY_LEADER);
@@ -30,9 +33,23 @@ public class ZkClientUtil {
 				ZKClientListener zkClientListener = new ZKClientListener();
 				zkClientListener.setCache(cache);
 				leaderLatch.addListener(zkClientListener);
-				zkClient = new ZkClient(leaderLatch, cfClient);
+				zkClient = new ZkClientLatch(leaderLatch, cfClient);
 				zkClient.setCache(cache);
-				zkClientMap.put(zkClientInfo.getId(), zkClient);
+				zkClientLatchMap.put(zkClientInfo.getId(), zkClient);
+				zkClient.startZKClient();
+			}
+		}
+		return zkClient;
+	}
+	
+	public static ZkClientSelector getZkClient(ZkClientInfo zkClientInfo, LeaderSelectorListener listener) throws Exception {
+		ZkClientSelector zkClient = zkClientSelectorMap.get(zkClientInfo.getId());
+		if(null == zkClient) {
+			synchronized (ZkClientLatch.class) {
+				CuratorFramework cfClient = getCuratorClient(zkClientInfo);
+				LeaderSelector selector = new LeaderSelector(cfClient, zkClientInfo.getLeaderPath(), listener);
+				zkClient = new ZkClientSelector(selector, cfClient);
+				zkClientSelectorMap.put(zkClientInfo.getId(), zkClient);
 				zkClient.startZKClient();
 			}
 		}

@@ -3,7 +3,7 @@ package com.appleframework.binlog.zk.util;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.appleframework.binlog.zk.election.ZkClient;
+import com.appleframework.binlog.zk.election.ZkClientLatch;
 import com.appleframework.binlog.zk.election.ZkClientInfo;
 import com.appleframework.binlog.zk.election.ZkClientUtil;
 
@@ -16,7 +16,7 @@ public class ZkClientTest2 {
 		zkClientInfo.setId("2");
 		zkClientInfo.setLeaderPath("/apple/binlog/master");
 		zkClientInfo.setDataPath("/apple/binlog/data");
-		ZkClient zkClient = ZkClientUtil.getZkClient(zkClientInfo);
+		ZkClientLatch zkClient = ZkClientUtil.getZkClient(zkClientInfo);
 		
 		log.info("zk客户端连接成功");
 

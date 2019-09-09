@@ -7,7 +7,7 @@ import com.appleframework.binlog.booter.ApplicationBooter;
 import com.appleframework.binlog.config.BinaryLogConfig;
 import com.appleframework.binlog.runner.ApplicationRunner;
 import com.appleframework.binlog.zk.config.ZkConfig;
-import com.appleframework.binlog.zk.election.ZkClient;
+import com.appleframework.binlog.zk.election.ZkClientLatch;
 import com.appleframework.binlog.zk.election.ZkClientUtil;
 
 public class ZkApplicationBooter implements ApplicationBooter {
@@ -24,7 +24,7 @@ public class ZkApplicationBooter implements ApplicationBooter {
 
 	@Override
 	public void run() {
-		ZkClient zkClient;
+		ZkClientLatch zkClient;
 		try {
 			zkClient = ZkClientUtil.getZkClient(ZkConfig.getZkClientInfo());
 			logger.info("zk客户端连接成功");
@@ -63,7 +63,8 @@ public class ZkApplicationBooter implements ApplicationBooter {
 				Thread.sleep(1000);
 			}
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("启动异常，程序退出！", e);
+            System.exit(1);
 		}
 	}
 
