@@ -51,16 +51,23 @@ public class ZkApplicationBooter implements ApplicationBooter {
 		                        @Override
 		                        public void run() {
 		                        	isRun = true;
-		                        	applicationRunner.run();
+		                        	try {
+		                        		applicationRunner.run();
+									} catch (Exception e) {
+										logger.error("BinLog监听异常", e);
+									} finally {
+										logger.warn("主动放弃领导权...");
+										applicationRunner.disconnect();
+									}
 		                        }
 		                    });
-							t.setName("sync-binlog-booter");
+							t.setName("zk-application-booter");
 		                    t.setDaemon(true);
 		                    t.start();
 						}
 					}
 				}
-				Thread.sleep(1000);
+				Thread.sleep(ZkConfig.getZkClientInfo().getRetrySleepTime());
 			}
 		} catch (Exception e) {
 			logger.error("启动异常，程序退出！", e);

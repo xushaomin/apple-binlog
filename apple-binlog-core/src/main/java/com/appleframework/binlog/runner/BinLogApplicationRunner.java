@@ -164,7 +164,6 @@ public class BinLogApplicationRunner implements ApplicationRunner {
             } catch (IOException e) {
             }
         }
-        BinaryLogConfig.setRun(false);
     }
 
 }

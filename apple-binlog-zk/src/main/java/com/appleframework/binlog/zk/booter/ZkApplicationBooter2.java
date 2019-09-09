@@ -81,6 +81,7 @@ public class ZkApplicationBooter2 implements ApplicationBooter {
 							}
 						}
 					});
+					t.setName("zk-application-booter");
 					t.setDaemon(true);
 					t.start();
 					logger.warn("当前节点放弃领导权");
