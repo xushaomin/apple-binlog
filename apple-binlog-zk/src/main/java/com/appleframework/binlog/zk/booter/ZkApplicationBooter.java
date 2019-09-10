@@ -36,7 +36,6 @@ public class ZkApplicationBooter implements ApplicationBooter {
             }
         });
 		thread.setName("zk-application-booter");
-		thread.setDaemon(true);
 		thread.start();
     }
     
