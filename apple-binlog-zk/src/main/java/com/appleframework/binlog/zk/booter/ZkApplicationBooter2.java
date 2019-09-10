@@ -27,8 +27,6 @@ public class ZkApplicationBooter2 implements ApplicationBooter {
 
 	private ZkClientSelector zkClient;
 	
-	private Thread thread;
-
 	/**
 	 * 是否有领导权
 	 */
@@ -51,30 +49,28 @@ public class ZkApplicationBooter2 implements ApplicationBooter {
 	 * 启动线程，判断程序是否健康，不健康退出选举
 	 */
 	private void requeue() {
-		if(null == thread) {
-			thread = new Thread(new Runnable() {
-				@Override
-				public void run() {
-					if (zkClient.getLeader() != null) {
-						// 为了让出领导权，让其他节点有足够的时间获取领导权
-						int sheepTime = ZkConfig.getZkClientInfo().getRetrySleepTime();
-						try {
-							Thread.sleep(sheepTime);
-						} catch (InterruptedException e) {
-							logger.error(e.getMessage());
-						}
-						// 如果程序已经在停止了，就不参与竞选了
-						if (!isDestory) {
-							logger.info("休眠{}秒之后节点再次开始竞选Leader...", sheepTime);
-							zkClient.getLeader().requeue();
-						}
+		Thread thread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				if (zkClient.getLeader() != null) {
+					// 为了让出领导权，让其他节点有足够的时间获取领导权
+					int sheepTime = ZkConfig.getZkClientInfo().getRetrySleepTime();
+					try {
+						Thread.sleep(sheepTime);
+					} catch (InterruptedException e) {
+						logger.error(e.getMessage());
+					}
+					// 如果程序已经在停止了，就不参与竞选了
+					if (!isDestory) {
+						logger.info("休眠{}秒之后节点再次开始竞选Leader...", sheepTime);
+						zkClient.getLeader().requeue();
 					}
 				}
-			});
-			thread.setName("zk-application-booter");
-			thread.setDaemon(true);
-			thread.start();
-		}
+			}
+		});
+		thread.setName("zk-application-booter");
+		thread.setDaemon(true);
+		thread.start();
 	}
 
 	@Override
