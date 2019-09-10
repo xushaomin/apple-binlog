@@ -90,8 +90,13 @@ public class ZkApplicationBooter2 implements ApplicationBooter {
 						// 放弃领导权，并断开
 						relinquished();
 					}
-
-					requeue();
+					if (isDestory) {
+                        synchronized (waitingObj) {
+                            waitingObj.notifyAll();
+                        }
+                    } else {
+                        requeue();
+                    }
 				}
 
 				@Override
@@ -112,11 +117,30 @@ public class ZkApplicationBooter2 implements ApplicationBooter {
 			destory();
 		}
 	}
-
+	
+    /**
+     * 用于关闭
+     */
+    private Object waitingObj = new Object();
+    
 	@Override
 	public void destory() {
 		isDestory = true;
 		applicationRunner.destory();
+
+        // 优雅关闭
+        synchronized (waitingObj) {
+            try {
+                waitingObj.wait(10000);
+            } catch (InterruptedException ex) {
+                logger.error("线程被中断");
+            }
+        }
+
+        if (zkClient.getLeader() != null) {
+            zkClient.getLeader().close();
+        }
+        zkClient.getClient().close();
 	}
 
 	@Override
