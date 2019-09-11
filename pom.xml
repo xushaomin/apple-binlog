@@ -191,13 +191,13 @@
 	<distributionManagement>
 		<repository>
 			<id>apple-releases</id>
-			<name>Local Nexus Releases Repository</name>
+			<name>Apple Nexus Releases Repository</name>
 			<url>http://nexus.appleframework.com:8081/nexus/content/repositories/releases</url>
 		</repository>
 
 		<snapshotRepository>
 			<id>apple-snapshots</id>
-			<name>Local Nexus Snapshots Repository</name>
+			<name>Apple Nexus Snapshots Repository</name>
 			<url>http://nexus.appleframework.com:8081/nexus/content/repositories/snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
