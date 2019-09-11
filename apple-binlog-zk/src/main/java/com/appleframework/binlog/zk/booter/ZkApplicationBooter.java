@@ -1,100 +1,148 @@
 package com.appleframework.binlog.zk.booter;
 
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.recipes.leader.LeaderSelectorListener;
+import org.apache.curator.framework.recipes.leader.LeaderSelectorListenerAdapter;
+import org.apache.curator.framework.state.ConnectionState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.appleframework.binlog.booter.ApplicationBooter;
 import com.appleframework.binlog.runner.ApplicationRunner;
 import com.appleframework.binlog.zk.config.ZkConfig;
-import com.appleframework.binlog.zk.election.ZkClientLatch;
+import com.appleframework.binlog.zk.election.ZkClientSelector;
 import com.appleframework.binlog.zk.election.ZkClientUtil;
 
 public class ZkApplicationBooter implements ApplicationBooter {
 
 	private static final Logger logger = LoggerFactory.getLogger(ZkApplicationBooter.class);
 
+	private boolean isDestory = false;
+
 	private ApplicationRunner applicationRunner;
 
 	public void setApplicationRunner(ApplicationRunner applicationRunner) {
 		this.applicationRunner = applicationRunner;
 	}
-    
-    private Thread thread = null;
-        
-    private void threadStart() {
-		thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-            	try {
-            		applicationRunner.run();
-				} catch (Exception e) {
-					logger.error("BinLog监听异常", e);
-				} finally {
-					logger.warn("主动放弃领导权...");
-					applicationRunner.destory();
+
+	private ZkClientSelector zkClient;
+
+	/**
+	 * 是否有领导权
+	 */
+	private boolean hasLeadership() {
+		if (zkClient != null) {
+			return zkClient.hasLeadership();
+		}
+		return false;
+	}
+
+	/**
+	 * 放弃领导权
+	 */
+	private void relinquished() {
+		logger.warn("主动放弃领导权...");
+		applicationRunner.disconnect();
+	}
+
+	/**
+	 * 启动线程，判断程序是否健康，不健康退出选举
+	 */
+	private void requeue() {
+		Thread thread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				if (zkClient.getLeader() != null) {
+					// 为了让出领导权，让其他节点有足够的时间获取领导权
+					int sheepTime = ZkConfig.getZkClientInfo().getRetrySleepTime();
+					try {
+						Thread.sleep(sheepTime);
+					} catch (InterruptedException e) {
+						logger.error(e.getMessage());
+					}
+					// 如果程序已经在停止了，就不参与竞选了
+					if (!isDestory) {
+						logger.info("休眠{}秒之后节点再次开始竞选Leader...", sheepTime);
+						zkClient.getLeader().requeue();
+					}
 				}
-            }
-        });
+			}
+		});
 		thread.setName("zk-application-booter");
+		thread.setDaemon(true);
 		thread.start();
-    }
-    
-    private void threadStop() {
-    	logger.debug("当前服务不是Leader, 停止所有");
-    	if(applicationRunner.isRun()) {
-    		applicationRunner.destory();
-    	}
-    	if(null != thread) {
-    		thread = null;
-    	}
-    }
-    
-    private boolean isThreadExist() {
-    	return (null == thread) ? false : true;
-    }
+	}
 
 	@Override
 	public void run() {
-		ZkClientLatch zkClient;
+		logger.warn("开始竞选Leader...");
 		try {
-			zkClient = ZkClientUtil.getZkClient(ZkConfig.getZkClientInfo());
-			logger.info("zk客户端连接成功");
-			Thread.sleep(100);
-			while (true) {
-				if (!zkClient.hasLeadership()) {
-					logger.debug("当前服务不是Leader");
-					threadStop();
-				} else {
-					logger.debug("当前服务是Leader");
-					if(!isThreadExist()) {
-						logger.debug("当前服务是Leader，线程不存在，重新启动");
-						this.threadStart();
+			LeaderSelectorListener listener = new LeaderSelectorListenerAdapter() {
+
+				@Override
+				public void takeLeadership(CuratorFramework client) throws Exception {
+					logger.warn("当前节点成功竞选为Leader，开始启动BinLog监听...");
+					try {
+						applicationRunner.run();
+					} catch (Exception e) {
+						logger.error("BinLog监听异常", e);
+					} finally {
+						// 放弃领导权，并断开
+						relinquished();
 					}
-					else {
-						if(thread.isAlive()) {
-							if(applicationRunner.isRun()) {
-								if (!applicationRunner.isConnected()) {
-									applicationRunner.connect();
-								}
-							}
-						} else {
-							threadStop();
-							threadStart();
+					if (isDestory) {
+						synchronized (waitingObj) {
+							waitingObj.notifyAll();
+						}
+					} else {
+						requeue();
+					}
+				}
+
+				@Override
+				public void stateChanged(CuratorFramework client, ConnectionState newState) {
+					logger.warn("ZK连接状态改变：{}", newState);
+					if (client.getConnectionStateErrorPolicy().isErrorState(newState)) {
+						if (hasLeadership()) {
+							logger.error("连接丢失，放弃Leader");
+							relinquished();
 						}
 					}
 				}
-				Thread.sleep(ZkConfig.getZkClientInfo().getRetrySleepTime());
-			}
+
+			};
+			zkClient = ZkClientUtil.getZkClient(ZkConfig.getZkClientInfo(), listener);
 		} catch (Exception e) {
-			logger.error("启动异常，程序退出！", e);
+			logger.error("启动异常！", e);
+			destory();
 		}
 	}
 
+	/**
+	 * 用于关闭
+	 */
+	private Object waitingObj = new Object();
+
 	@Override
 	public void destory() {
-		threadStop();
+		isDestory = true;
+		applicationRunner.destory();
+
+		// 优雅关闭
+		synchronized (waitingObj) {
+			try {
+				waitingObj.wait(10000);
+			} catch (InterruptedException ex) {
+				logger.error("线程被中断");
+			}
+		}
+
+		if (zkClient.getLeader() != null) {
+			zkClient.getLeader().close();
+		}
+		zkClient.getClient().close();
 	}
-	
+
 	@Override
 	public boolean isRun() {
 		return applicationRunner.isRun();

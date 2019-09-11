@@ -13,9 +13,9 @@ public class ZkClientInfo implements Serializable {
 	private String connectString = "127.0.0.1";
 	
 	// 节点路径
-	private String leaderPath = "/apple/election";
+	private String leaderPath = "/apple/selector/leader";
 	
-	private String dataPath = "/apple/data";
+	private String dataPath = "/apple/selector/data";
 	
 	// 连接超时时间
 	private Integer connectTimeOut = 5000;

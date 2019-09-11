@@ -11,8 +11,8 @@
 		<!-- <bean class="org.apache.tomcat.jdbc.pool.PoolProperties"> -->
 		<!-- 数据库连接池配置 -->
 		<!-- 用户名、密码 -->
-		<property name="username" value="root" />
-		<property name="password" value="bykj@2017~" />
+		<property name="username" value="rd" />
+		<property name="password" value="azD6t5l638xTWdMhV3hK1XzUu" />
 		<!-- 驱动的完整有效的java类名,建立连接的URL -->
 		<!-- <property name="driverClassName" value="com.mysql.jdbc.Driver" /> 
 			<property name="url" value="jdbc:mysql://localhost:3306/mysql" /> -->

@@ -9,10 +9,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.appleframework.binlog.config.BinaryLogConfig;
 import com.appleframework.binlog.runner.ApplicationRunner;
+import com.appleframework.binlog.zk.booter.ZkApplicationBooter;
 import com.appleframework.binlog.zk.config.ZkConfig;
-import com.appleframework.binlog.zk.election.ZkClientLatch;
-import com.appleframework.binlog.zk.election.ZkClientInfo;
-import com.appleframework.binlog.zk.election.ZkClientUtil;;
+import com.appleframework.binlog.zk.election.ZkClientInfo;;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -25,16 +24,20 @@ public class StartTest {
 	private static ZkClientInfo zkClientInfo;
 	
 	static {
+		BinaryLogConfig.setBinLogInit(true);
+		BinaryLogConfig.setBinlogFilename("mysql-bin.000729");
+		BinaryLogConfig.setBinlogPosition(115119064L);
 		BinaryLogConfig.setHost("192.168.1.211");
 		BinaryLogConfig.setPort(3306);
-		BinaryLogConfig.setUsername("root");
-		BinaryLogConfig.setPassword("bykj@2017~");
+		BinaryLogConfig.setUsername("rd");
+		BinaryLogConfig.setPassword("azD6t5l638xTWdMhV3hK1XzUu");
 		BinaryLogConfig.setServerId(123456L);
 		
 		zkClientInfo = new ZkClientInfo();
-		zkClientInfo.setId("1");
-		zkClientInfo.setLeaderPath("/apple/binlog/master");
-		zkClientInfo.setDataPath("/apple/binlog/data");
+		zkClientInfo.setConnectString("192.168.1.217:4181,192.168.1.218:4181,192.168.1.219:4181");
+		zkClientInfo.setId("2");
+		zkClientInfo.setLeaderPath("/test/binlog/master");
+		zkClientInfo.setDataPath("/test/binlog/data");
 		ZkConfig.setZkClientInfo(zkClientInfo);
 	}
 	
@@ -42,38 +45,11 @@ public class StartTest {
 	public void testAddOpinion1() {
 		try {
 			
+			ZkApplicationBooter booter = new ZkApplicationBooter();
+			booter.setApplicationRunner(applicationRunner);
+			booter.run();
 			
-			ZkClientLatch zkClient = ZkClientUtil.getZkClient(zkClientInfo);
-			
-			ZkConfig.setZkClientInfo(zkClientInfo);
-			System.out.println("zk客户端连接成功");
-
-			Thread.sleep(3000);
-			while(true) {
-				
-				//第一步leader验证 
-				if (!zkClient.hasLeadership()) {
-					System.out.println("当前服务不是leader");
-					if(applicationRunner.isConnected()) {
-						applicationRunner.disconnect();
-					}
-				} else {
-					System.out.println("当前服务是leader");
-					if(BinaryLogConfig.isRun()) {
-						if(!applicationRunner.isConnected()) {
-							applicationRunner.connect();
-						}
-					}
-					else {
-						applicationRunner.run();
-					}
-				}
-				System.out.println("Test01 do it... ");
-				Thread.sleep(5000);
-			}
-			
-			
-			
+			System.in.read();
 		} catch(Exception e) {
 			e.printStackTrace();
 		} 

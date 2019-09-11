@@ -20,7 +20,7 @@ public class ZkClientSelector {
 	 * @throws Exception
 	 */
 	@SuppressWarnings("deprecation")
-	public void startZKClient() throws Exception {
+	public void start() {
 		if (!client.isStarted()) {
 			client.start();
 		}
@@ -32,7 +32,7 @@ public class ZkClientSelector {
 	 * 
 	 * @throws Exception
 	 */
-	public void closeZKClient() throws Exception {
+	public void close() {
 		leader.close();
 		client.close();
 	}
