@@ -1,5 +1,8 @@
 package com.appleframework.binlog.zk.booter;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.leader.LeaderSelectorListener;
 import org.apache.curator.framework.recipes.leader.LeaderSelectorListenerAdapter;
@@ -91,9 +94,7 @@ public class ZkApplicationBooter implements ApplicationBooter {
 						relinquished();
 					}
 					if (isDestory) {
-						synchronized (waitingObj) {
-							waitingObj.notifyAll();
-						}
+					    doneLatch.countDown();
 					} else {
 						requeue();
 					}
@@ -121,21 +122,22 @@ public class ZkApplicationBooter implements ApplicationBooter {
 	/**
 	 * 用于关闭
 	 */
-	private Object waitingObj = new Object();
+	private CountDownLatch doneLatch = new CountDownLatch(1);
 
 	@Override
 	public void destory() {
+	    logger.warn("结束程序...");
 		isDestory = true;
+		boolean isLeader = hasLeadership();
 		applicationRunner.destory();
 
 		// 优雅关闭
-		synchronized (waitingObj) {
-			try {
-				waitingObj.wait(10000);
-			} catch (InterruptedException ex) {
-				logger.error("线程被中断");
-			}
-		}
+        if (isLeader) {
+            try {
+                doneLatch.await(5, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+            }
+        }
 
 		if (zkClient.getLeader() != null) {
 			zkClient.getLeader().close();
