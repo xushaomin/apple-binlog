@@ -12,10 +12,7 @@
 	<artifactId>apple-binlog-zk</artifactId>
 	<name>apple-binlog-zk</name>
 	<url>http://maven.apache.org</url>
-	<properties>
-		<curator.version>4.0.1</curator.version>
-		<zookeeper.version>3.4.6</zookeeper.version>
-	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
@@ -46,6 +43,11 @@
 		<dependency>
   			<groupId>org.springframework</groupId>
   			<artifactId>spring-test</artifactId>
+  			<scope>test</scope>
+		</dependency>
+		<dependency>
+  			<groupId>junit</groupId>
+  			<artifactId>junit</artifactId>
   			<scope>test</scope>
 		</dependency>
 		

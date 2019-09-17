@@ -17,7 +17,7 @@
 		<binlog.version>0.18.1.APPLE</binlog.version>
 		<tomcat.version>8.0.53</tomcat.version>
 		<curator.version>4.0.1</curator.version>
-		<zookeeper.version>3.4.6</zookeeper.version>
+		<zookeeper.version>[3.4.14,)</zookeeper.version>
 	</properties>
 
 	<modules>
